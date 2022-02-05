@@ -1,11 +1,12 @@
-package com.dp.cashier_page
+package com.dp.cashier_page.ui.activities
 
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.dp.cashier_page.data.HttpProductListItem
+import com.dp.cashier_page.R
+import com.dp.cashier_page.domain.Item
 import com.google.android.material.textfield.TextInputEditText
 import de.starkling.shoppingcart.widget.CounterView
 
@@ -43,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         counterView = findViewById(R.id.counterView) as CounterView
 
         /*SAMPLE RESPONSE FROM BACKEND*/
-        var response = HttpProductListItem()
+        var response = Item()
         response.quantity = 5
         response.srpPrice = 1000.0
 
@@ -63,10 +64,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun computation(
         count: Int,
-        response: HttpProductListItem
+        response: Item
     ) {
 
-        /*TODO FIX THE BUGS INCREMENT QTY BUT GOT EXTRA QTY*/
         var price: Double = response.srpPrice!!
         var qtyToPriceTotal = count * price
 
