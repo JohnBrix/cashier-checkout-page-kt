@@ -19,6 +19,19 @@ class InventoryAdapter(
         var itemName = itemView.findViewById(R.id.productItem) as TextView
         var qty = itemView.findViewById(R.id.qty) as TextView
         var srpPrice = itemView.findViewById(R.id.price) as TextView
+        var add = itemView.findViewById(R.id.addToCart) as Button
+        
+        
+
+        /*TODO: ADD THE CART HERE PASS THE ITEM LIST*/
+        fun addToCartToCheckout(item: Item) {
+            println("VIEWHOLDER: "+item.itemName)
+            /*TODO: GET BY INDIVIDUAL FIRST THEN SHOULD PUT IN LIST FORM TO CREATE TO CHECKOUT*/
+
+
+
+        }
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -28,7 +41,13 @@ class InventoryAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        var itemList = item.get(position);
+        var itemList = item.get(position)
+        
+        
+        holder.add.setOnClickListener{
+            holder.addToCartToCheckout(itemList)/*ADDED TO CART*/
+        }
+        
 
         Picasso.get().load(itemList?.itemPicture).into(holder.itemImages)
         holder.itemName.text = itemList.itemName
