@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable
             name="productViewModel"
@@ -50,17 +51,17 @@
             android:id="@+id/productRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="vertical" />
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floatBtn"
+            tools:listitem="@layout/list_product_item"
+            android:scrollbars="vertical"
+            tools:itemCount="2"/>
+        <com.tuann.floatingactionbuttonexpandable.FloatingActionButtonExpandable
+            android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginRight="20dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:tint="@android:color/white"
-            android:backgroundTint="#0038FF" />
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="20dp" />
+
     </LinearLayout>
 
 </ScrollView>
