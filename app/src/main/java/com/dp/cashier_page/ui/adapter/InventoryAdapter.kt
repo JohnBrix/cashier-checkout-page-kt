@@ -20,7 +20,7 @@ class InventoryAdapter(
         var qty = itemView.findViewById(R.id.qty) as TextView
         var srpPrice = itemView.findViewById(R.id.price) as TextView
         var add = itemView.findViewById(R.id.addToCart) as Button
-        
+        /*create floating button*/
         
 
         /*TODO: ADD THE CART HERE PASS THE ITEM LIST*/
@@ -29,7 +29,9 @@ class InventoryAdapter(
             /*TODO: GET BY INDIVIDUAL FIRST THEN SHOULD PUT IN LIST FORM TO CREATE TO CHECKOUT*/
 
 
-
+            //TODO CREATE INFLATER LAYOUT TO PASS THE DATA FROM item to dialog
+//            val view = LayoutInflater.from(context)
+//                .inflate(R.layout.dialog_admin_stock_in, null, false)
         }
 
     }
