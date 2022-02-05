@@ -5,7 +5,6 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.addTextChangedListener
 import com.dp.cashier_page.data.HttpProductListItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -35,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         response.quantity = 5
         response.srpPrice = 500.0
 
+        var subCount : Int = 0
 
         counterView.addCounterValueChangeListener(object :CounterView.CounterValueChangeListener{
             override fun onValueDelete(count: Int) {
@@ -44,38 +44,42 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onValueAdd(count: Int) {
-                /*TODO FIX THE BUGS INCREMENT QTY BUT GOT EXTRA QTY*/
 
+                /*TODO FIX THE BUGS INCREMENT QTY BUT GOT EXTRA QTY*/
                 var price: Double = response.srpPrice!!
                 var qtyToPriceTotal = count * price
 
-                if (count >= response.quantity!!){
-                    Toast.makeText(applicationContext, "counterValue", Toast.LENGTH_SHORT).show()
-                    counterView.counterValue = response.quantity!!
+                if ( count > response.quantity!!){
+                    Toast.makeText(applicationContext, "${count}", Toast.LENGTH_SHORT).show()
+                    counterView.counterValue = response.quantity!! //Stoping the count
+
                 }
+                else {
+                    totalSpecificItems.text = qtyToPriceTotal.toString()
 
-                totalSpecificItems.text = qtyToPriceTotal.toString()
+                    priceTextView.setText(response.srpPrice.toString()) /*DISPLAY UI FROM RESPONSE*/
 
-                priceTextView.setText(response.srpPrice.toString()) /*DISPLAY UI FROM RESPONSE*/
+                    var totalChange = findViewById(R.id.totalChange) as TextView
+                    btn.setOnClickListener {
 
-                var totalChange = findViewById(R.id.totalChange) as TextView
-                btn.setOnClickListener {
+                        /*AUTO COMPUTE*/
 
-                    /*AUTO COMPUTE*/
-
-                    var pay: Double = cash.text.toString().toDouble()
+                        var pay: Double = cash.text.toString().toDouble()
 
 
-                    var computed: Double = pay - qtyToPriceTotal
+                        var computed: Double = pay - qtyToPriceTotal
 
-                    totalChange.setText(computed.toString())
+                        totalChange.setText(computed.toString())
 
-                    if (computed < -0.0) {
-                        Toast.makeText(applicationContext, "Insufficient Cash!", Toast.LENGTH_SHORT).show()
+                        if (computed < -0.0) {
+                            Toast.makeText(applicationContext, "Insufficient Cash!", Toast.LENGTH_SHORT).show()
+                        }
+
+                        cash.clearFocus();
                     }
-
-                    cash.clearFocus();
                 }
+
+
             }
 
         })
