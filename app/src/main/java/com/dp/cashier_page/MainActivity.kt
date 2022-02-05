@@ -18,6 +18,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var totalSpecificItems: TextView
     lateinit var totalItems: TextView
     lateinit var tax: TextView
+    lateinit var grandTotal: TextView
 
     lateinit var counterView: CounterView
 
@@ -37,13 +38,14 @@ class MainActivity : AppCompatActivity() {
         totalItems = findViewById(R.id.totalItems) as TextView
         tax = findViewById(R.id.tax) as TextView
 
+        grandTotal = findViewById(R.id.grandTotal) as TextView
+
         counterView = findViewById(R.id.counterView) as CounterView
 
         /*SAMPLE RESPONSE FROM BACKEND*/
         var response = HttpProductListItem()
         response.quantity = 5
-        response.srpPrice = 500.0
-
+        response.srpPrice = 1000.0
 
         counterView.addCounterValueChangeListener(object : CounterView.CounterValueChangeListener {
             override fun onValueDelete(count: Int) {
@@ -51,7 +53,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onValueAdd(count: Int) {
-                computation(count,response)
+                computation(count, response)
             }
 
         })
@@ -59,11 +61,15 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun computation(count: Int, response: HttpProductListItem) {
+    private fun computation(
+        count: Int,
+        response: HttpProductListItem
+    ) {
 
         /*TODO FIX THE BUGS INCREMENT QTY BUT GOT EXTRA QTY*/
         var price: Double = response.srpPrice!!
         var qtyToPriceTotal = count * price
+
 
         if (count > response.quantity!!) {
             Toast.makeText(applicationContext, "${count}", Toast.LENGTH_SHORT).show()
@@ -84,13 +90,18 @@ class MainActivity : AppCompatActivity() {
                 var vat = qtyToPriceTotal * 0.12
                 tax.setText(vat.toString())
 
+                var subTotalItems = qtyToPriceTotal - vat
+
                 totalChange.setText(computed.toString())
-                totalItems.setText(qtyToPriceTotal.toString())
+                totalItems.setText(subTotalItems.toString())
+                grandTotal.setText(qtyToPriceTotal.toString())
 
                 if (computed < -0.0) {
                     Toast.makeText(applicationContext, "Insufficient Cash!", Toast.LENGTH_SHORT)
                         .show()
                 }
+
+                //CREATE POS REQUEST  TO BACKEND
 
                 cash.clearFocus();
             }
