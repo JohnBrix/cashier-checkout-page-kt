@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.view.*
 import android.widget.*
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dp.cashier_page.R
 import com.dp.cashier_page.domain.Item
@@ -25,18 +26,14 @@ class InventoryAdapter(
         var fab = itemView.findViewById(R.id.fab) as Button
 
 
-        fun addToCartToCheckout(item: Item) {
-            println("VIEWHOLDER: "+item.itemName)
+        fun addToCartToCheckout(item: List<Item>) {
 
-            var itemList = ArrayList<Item>()
-            itemList.add(item)
 
             itemView.apply {
                 fab.setOnClickListener {
                     val view = LayoutInflater.from(context)
                         .inflate(R.layout.recycler_checkout, null, false)
 
-                    println("CLICK FAB: " + itemList)
 
                     /*CREATE ADAPTER HERE*/
 
@@ -62,13 +59,13 @@ class InventoryAdapter(
                     view.apply {
                         var dashboardRecycleView: RecyclerView? = null
                         val recyclerView = findViewById<RecyclerView>(R.id.checkoutRecycler)
-                        recyclerView.layoutManager =
-                            GridLayoutManager(context, 1, GridLayoutManager.HORIZONTAL, false)
+                        recyclerView.layoutManager = LinearLayoutManager(context)
+                          /*  GridLayoutManager(context, 1, GridLayoutManager.VERTICAL, false)*/
                         dashboardRecycleView?.layoutManager = recyclerView.layoutManager
 
-                        println("LIST ADDED: "+itemList)
 
-                        recyclerView.adapter = CheckoutAdapter(itemList)
+
+                        recyclerView.adapter = CheckoutAdapter(item)
 
 
 
@@ -95,7 +92,7 @@ class InventoryAdapter(
         
         
         holder.add.setOnClickListener{
-            holder.addToCartToCheckout(itemList)/*ADDED TO CART*/
+            holder.addToCartToCheckout(item)/*ADDED TO CART*/
         }
         
 
