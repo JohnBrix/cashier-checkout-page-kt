@@ -91,6 +91,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="Add to cart" />
+
+                <Button
+                    android:id="@+id/fab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Buy now"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"/>
             </LinearLayout>
 
         </LinearLayout>

@@ -1,7 +1,9 @@
 package com.dp.cashier_page.ui.adapter
 
+import android.app.AlertDialog
 import android.view.*
 import android.widget.*
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dp.cashier_page.R
 import com.dp.cashier_page.domain.Item
@@ -20,19 +22,65 @@ class InventoryAdapter(
         var qty = itemView.findViewById(R.id.qty) as TextView
         var srpPrice = itemView.findViewById(R.id.price) as TextView
         var add = itemView.findViewById(R.id.addToCart) as Button
-        /*create floating button*/
-        
+        var fab = itemView.findViewById(R.id.fab) as Button
 
-        /*TODO: ADD THE CART HERE PASS THE ITEM LIST*/
+
         fun addToCartToCheckout(item: Item) {
             println("VIEWHOLDER: "+item.itemName)
-            /*TODO: GET BY INDIVIDUAL FIRST THEN SHOULD PUT IN LIST FORM TO CREATE TO CHECKOUT*/
+
+            var itemList = ArrayList<Item>()
+            itemList.add(item)
+
+            itemView.apply {
+                fab.setOnClickListener {
+                    val view = LayoutInflater.from(context)
+                        .inflate(R.layout.recycler_checkout, null, false)
+
+                    println("CLICK FAB: " + itemList)
+
+                    /*CREATE ADAPTER HERE*/
+
+                    var dialog: AlertDialog?
+                    val mBuilder = AlertDialog.Builder(
+                        view.context,
+                        android.R.style.Theme_Material_Light_NoActionBar_Fullscreen
+                    )
+                    /*   Theme_Material_Light_NoActionBar_Fullscreen*/
+                    mBuilder.setCancelable(false)
+                    mBuilder.setView(view)
+                    dialog = mBuilder.create()
+                    dialog.show()
+
+                    val window: Window? = dialog.getWindow()
+                    if (window != null) {
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+                    }
+                    if (window != null) {
+                        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+                    }
+
+                    view.apply {
+                        var dashboardRecycleView: RecyclerView? = null
+                        val recyclerView = findViewById<RecyclerView>(R.id.checkoutRecycler)
+                        recyclerView.layoutManager =
+                            GridLayoutManager(context, 1, GridLayoutManager.HORIZONTAL, false)
+                        dashboardRecycleView?.layoutManager = recyclerView.layoutManager
+
+                        println("LIST ADDED: "+itemList)
+
+                        recyclerView.adapter = CheckoutAdapter(itemList)
 
 
-            //TODO CREATE INFLATER LAYOUT TO PASS THE DATA FROM item to dialog
-//            val view = LayoutInflater.from(context)
-//                .inflate(R.layout.dialog_admin_stock_in, null, false)
-        }
+
+
+                    }
+
+
+
+                    }
+
+                }
+            }
 
     }
 
