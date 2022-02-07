@@ -1,14 +1,11 @@
 package com.dp.cashier_page.ui.adapter
 
-import android.app.AlertDialog
 import android.view.*
 import android.widget.*
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dp.cashier_page.R
 import com.dp.cashier_page.domain.Item
 import com.dp.cashier_page.ui.activities.AddToCart
-import com.google.gson.Gson
 import com.squareup.picasso.Picasso
 
 
@@ -44,7 +41,7 @@ class InventoryAdapter(
             callback.onAddToCard(itemList)
         }
         holder.fab.setOnClickListener {
-            callback.openCheckout()
+            callback.openCheckout(callback)
         }
 
         Picasso.get().load(itemList?.itemPicture).into(holder.itemImages)

@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -21,6 +23,8 @@ import com.dp.cashier_page.domain.Item
 import com.dp.cashier_page.ui.adapter.CheckoutAdapter
 import com.dp.cashier_page.ui.adapter.InventoryAdapter
 import com.dp.cashier_page.ui.viewmodel.ProductViewModel
+import com.google.android.material.textfield.TextInputEditText
+import de.starkling.shoppingcart.widget.CounterView
 
 class ProductActivity : AppCompatActivity(), AddToCart {
 
@@ -89,10 +93,9 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         println("Items: ${itemToCart.size}")
     }
 
-    override fun openCheckout() {
+    override fun openCheckout(callback: AddToCart) {
         val view = LayoutInflater.from(this)
             .inflate(R.layout.recycler_checkout, null, false)
-
 
         /*CREATE ADAPTER HERE*/
 
@@ -121,14 +124,99 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             recyclerView.layoutManager = LinearLayoutManager(context)
             dashboardRecycleView?.layoutManager = recyclerView.layoutManager
             /*TODO CREATE COMPUTATION HERE TO CREATE POS*/
-            recyclerView.adapter = CheckoutAdapter(itemToCart)
+            recyclerView.adapter = CheckoutAdapter(itemToCart, callback, view)
         }
     }
 
+    override fun checkout(
+        view: View,
+        count: Int,
+        response: Item,
+        counterValue: CounterView,
+        subTotalSpecificItem: TextView
+    ) {
+        view.apply {
+
+            computation(count, response, view, counterValue,subTotalSpecificItem)
+
+
+        }
+
+    }
 
 }
 
+private fun computation(
+    count: Int,
+    response: Item,
+    view: View,
+    counterView: CounterView,
+    subTotalSpecificItem: TextView,
+
+    ) {
+
+    view.apply {
+        var cash = findViewById(R.id.cash) as TextInputEditText
+        var btn = findViewById(R.id.checkOut) as Button
+        var productNameTextView = findViewById(R.id.productNameTextView) as TextView
+        var priceTextView = findViewById(R.id.priceTextView) as TextView
+        //TODO:COMPUTE THIS IN CHECKOUT ADAPTER
+        // var totalSpecificItems = findViewById(R.id.subTotalSpecificItem) as TextView
+        var totalItems = findViewById(R.id.totalItems) as TextView
+        var tax = findViewById(R.id.tax) as TextView
+        var grandTotal = findViewById(R.id.grandTotal) as TextView
+
+        var price: Double = response.srpPrice!!
+        var qtyToPriceTotal = count * price
+
+        /*FOR EACH THE DATA*/
+
+
+        if (count > response.quantity!!) {
+            Toast.makeText(context, "${count}", Toast.LENGTH_SHORT).show()
+            counterView.counterValue = response.quantity!! //Stoping the count
+
+        } else {
+            subTotalSpecificItem.text = qtyToPriceTotal.toString()
+            priceTextView.setText(response.srpPrice.toString()) /*DISPLAY UI FROM RESPONSE*/
+
+            var totalChange = findViewById(R.id.totalChange) as TextView
+            btn.setOnClickListener {
+                /*AUTO COMPUTE*/
+                var pay: Double = cash.text.toString().toDouble()
+                var computed: Double = pay - qtyToPriceTotal
+
+
+                /*VAT COMPUTE*/
+                var vat = qtyToPriceTotal * 0.12
+                tax.setText(vat.toString())
+
+                var subTotalItems = qtyToPriceTotal - vat
+
+                totalChange.setText(computed.toString())
+                totalItems.setText(subTotalItems.toString())
+                grandTotal.setText(qtyToPriceTotal.toString())
+
+                if (computed < -0.0) {
+                    Toast.makeText(context, "Insufficient Cash!", Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+                cash.clearFocus();
+            }
+        }
+    }
+}
+
+
 interface AddToCart {
     fun onAddToCard(item: Item)
-    fun openCheckout()
+    fun openCheckout(callback: AddToCart)
+    fun checkout(
+        view: View,
+        count: Int,
+        response: Item,
+        counterValue: CounterView,
+        subTotalSpecificItem: TextView
+    )
 }
