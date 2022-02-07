@@ -79,6 +79,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
     }
 
     override fun onAddToCard(item: Item) {
+        /*todo create validation here using hash dont create multiple add items with same id*/
         itemToCart.add(item)
         Toast.makeText(
             applicationContext,
@@ -118,8 +119,8 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             var dashboardRecycleView: RecyclerView? = null
             val recyclerView = findViewById<RecyclerView>(R.id.checkoutRecycler)
             recyclerView.layoutManager = LinearLayoutManager(context)
-            /*  GridLayoutManager(context, 1, GridLayoutManager.VERTICAL, false)*/
             dashboardRecycleView?.layoutManager = recyclerView.layoutManager
+            /*TODO CREATE COMPUTATION HERE TO CREATE POS*/
             recyclerView.adapter = CheckoutAdapter(itemToCart)
         }
     }
