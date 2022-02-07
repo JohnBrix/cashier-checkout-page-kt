@@ -80,6 +80,11 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
     override fun onAddToCard(item: Item) {
         itemToCart.add(item)
+        Toast.makeText(
+            applicationContext,
+            "Items: ${itemToCart.size}",
+            Toast.LENGTH_SHORT
+        ).show()
         println("Items: ${itemToCart.size}")
     }
 
