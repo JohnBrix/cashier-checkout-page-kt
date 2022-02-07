@@ -3,7 +3,7 @@ package com.dp.cashier_page.domain.request
 
 import com.google.gson.annotations.SerializedName
 
-data class Item(
+data class HttpPosRequestListItem(
     @SerializedName("id")
     var id: Int? = null,
     @SerializedName("itemName")
