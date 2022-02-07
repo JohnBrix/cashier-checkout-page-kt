@@ -10,7 +10,7 @@ import com.dp.cashier_page.R
 import com.dp.cashier_page.domain.Item
 import com.squareup.picasso.Picasso
 
-class CheckoutAdapter(val item: ArrayList<Item>) : RecyclerView.Adapter<CheckoutAdapter.ViewHolder>() {
+class CheckoutAdapter(val item: List<Item>) : RecyclerView.Adapter<CheckoutAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var itemImages = itemView.findViewById(R.id.productImage) as ImageView

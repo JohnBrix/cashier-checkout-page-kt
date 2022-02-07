@@ -13,6 +13,9 @@
         <entry key="..\:/Users/john brix17/Documents/Github Android/cashierpage/app/src/main/res/layout/counter_button.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/john brix17/Documents/Github Android/cashierpage/app/src/main/res/layout/fragment_first.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/john brix17/Documents/Github Android/cashierpage/app/src/main/res/layout/item_product_list.xml" value="0.25416666666666665" />
+        <entry key="app/src/main/res/layout/item_product_list.xml" value="0.21041666666666667" />
+        <entry key="app/src/main/res/layout/list_product_item.xml" value="0.21041666666666667" />
+        <entry key="app/src/main/res/layout/recycler_product.xml" value="0.21041666666666667" />
       </map>
     </option>
   </component>

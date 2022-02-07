@@ -7,11 +7,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dp.cashier_page.R
 import com.dp.cashier_page.domain.Item
+import com.dp.cashier_page.ui.activities.AddToCart
+import com.google.gson.Gson
 import com.squareup.picasso.Picasso
 
 
 class InventoryAdapter(
-    val item: List<Item>
+    val item: List<Item>,
+    val callback: AddToCart
 ) : RecyclerView.Adapter<InventoryAdapter.ViewHolder>() {
 
 
@@ -25,60 +28,6 @@ class InventoryAdapter(
         var fab = itemView.findViewById(R.id.fab) as Button
 
 
-        fun addToCartToCheckout(item: Item) {
-
-
-            itemView.apply {
-                fab.setOnClickListener {
-                    val view = LayoutInflater.from(context)
-                        .inflate(R.layout.recycler_checkout, null, false)
-
-
-                    /*CREATE ADAPTER HERE*/
-
-                    var dialog: AlertDialog?
-                    val mBuilder = AlertDialog.Builder(
-                        view.context,
-                        android.R.style.Theme_Material_Light_NoActionBar_Fullscreen
-                    )
-                    /*   Theme_Material_Light_NoActionBar_Fullscreen*/
-                    mBuilder.setCancelable(false)
-                    mBuilder.setView(view)
-                    dialog = mBuilder.create()
-                    dialog.show()
-
-                    val window: Window? = dialog.getWindow()
-                    if (window != null) {
-                        window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
-                    }
-                    if (window != null) {
-                        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                    }
-
-                    view.apply {
-                        var dashboardRecycleView: RecyclerView? = null
-                        val recyclerView = findViewById<RecyclerView>(R.id.checkoutRecycler)
-                        recyclerView.layoutManager = LinearLayoutManager(context)
-                          /*  GridLayoutManager(context, 1, GridLayoutManager.VERTICAL, false)*/
-                        dashboardRecycleView?.layoutManager = recyclerView.layoutManager
-
-                        var listItem = ArrayList<Item>()
-                        listItem.add(item)
-
-                        recyclerView.adapter = CheckoutAdapter(listItem)
-
-
-
-
-                    }
-
-
-
-                    }
-
-                }
-            }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -88,13 +37,15 @@ class InventoryAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        var itemList = item.get(position)
+        val itemList = item[position]
         
         
         holder.add.setOnClickListener{
-            holder.addToCartToCheckout(itemList)/*ADDED TO CART*/
+            callback.onAddToCard(itemList)
         }
-        
+        holder.fab.setOnClickListener {
+            callback.openCheckout()
+        }
 
         Picasso.get().load(itemList?.itemPicture).into(holder.itemImages)
         holder.itemName.text = itemList.itemName
