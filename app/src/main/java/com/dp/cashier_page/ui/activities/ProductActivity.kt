@@ -26,6 +26,7 @@ import com.dp.cashier_page.ui.viewmodel.ProductViewModel
 import com.google.android.material.textfield.TextInputEditText
 import de.starkling.shoppingcart.widget.CounterView
 
+
 class ProductActivity : AppCompatActivity(), AddToCart {
 
     private lateinit var binding: RecyclerProductBinding
@@ -133,11 +134,12 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         count: Int,
         response: Item,
         counterValue: CounterView,
-        subTotalSpecificItem: TextView
+        subTotalSpecificItem: TextView,
+        priceTextView: TextView
     ) {
         view.apply {
 
-            computation(count, response, view, counterValue,subTotalSpecificItem)
+            computation(count, response, view, counterValue, subTotalSpecificItem, priceTextView)
 
 
         }
@@ -146,65 +148,75 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
 }
 
+
 private fun computation(
     count: Int,
     response: Item,
     view: View,
     counterView: CounterView,
     subTotalSpecificItem: TextView,
+    priceTextView: TextView,
 
     ) {
 
     view.apply {
         var cash = findViewById(R.id.cash) as TextInputEditText
         var btn = findViewById(R.id.checkOut) as Button
-        var productNameTextView = findViewById(R.id.productNameTextView) as TextView
-        var priceTextView = findViewById(R.id.priceTextView) as TextView
-        //TODO:COMPUTE THIS IN CHECKOUT ADAPTER
-        // var totalSpecificItems = findViewById(R.id.subTotalSpecificItem) as TextView
+
         var totalItems = findViewById(R.id.totalItems) as TextView
         var tax = findViewById(R.id.tax) as TextView
         var grandTotal = findViewById(R.id.grandTotal) as TextView
+        var totalChange = findViewById(R.id.totalChange) as TextView
 
-        var price: Double = response.srpPrice!!
-        var qtyToPriceTotal = count * price
+        /*TODO CREATE COMPUTATION HERE YOU CANT COMPUTE DUE THE LIST
+        *  NAGUUNAHAN SILA PAG ID 2 PINILI MO ID 2 NACOCOMPUATE HINDI BOTH*/
 
-        /*FOR EACH THE DATA*/
 
+        var qtyToPriceTotal = count * response.srpPrice!!
+        subTotalSpecificItem.text = qtyToPriceTotal.toString() /*Subtotal specific item*/
+        println("specificItem: " + subTotalSpecificItem.text)
+        priceTextView.text = response.srpPrice.toString() /*original price item*/
 
         if (count > response.quantity!!) {
             Toast.makeText(context, "${count}", Toast.LENGTH_SHORT).show()
             counterView.counterValue = response.quantity!! //Stoping the count
 
-        } else {
-            subTotalSpecificItem.text = qtyToPriceTotal.toString()
-            priceTextView.setText(response.srpPrice.toString()) /*DISPLAY UI FROM RESPONSE*/
+        }
 
-            var totalChange = findViewById(R.id.totalChange) as TextView
+
             btn.setOnClickListener {
-                /*AUTO COMPUTE*/
                 var pay: Double = cash.text.toString().toDouble()
                 var computed: Double = pay - qtyToPriceTotal
+//                    var vat = qtyToPriceTotal * 0.12
+//                    tax.setText(vat.toString())
 
+                /*pay user*/
 
-                /*VAT COMPUTE*/
-                var vat = qtyToPriceTotal * 0.12
-                tax.setText(vat.toString())
-
-                var subTotalItems = qtyToPriceTotal - vat
 
                 totalChange.setText(computed.toString())
-                totalItems.setText(subTotalItems.toString())
-                grandTotal.setText(qtyToPriceTotal.toString())
+                /*AUTO COMPUTE*/
+//                var pay: Double = cash.text.toString().toDouble()
+//                var computed: Double = pay - qtyToPriceTotal
+//
+//
+//
+//
+//                var subTotalItems = qtyToPriceTotal - vat
+//
+//                totalChange.setText(computed.toString())
+//                totalItems.setText(subTotalItems.toString())
+//                grandTotal.setText(qtyToPriceTotal.toString())
 
-                if (computed < -0.0) {
-                    Toast.makeText(context, "Insufficient Cash!", Toast.LENGTH_SHORT)
-                        .show()
-                }
+//                if (computed < -0.0) {
+//                    Toast.makeText(context, "Insufficient Cash!", Toast.LENGTH_SHORT)
+//                        .show()
+//                }
 
-                cash.clearFocus();
+                /*    cash.clearFocus();*/
             }
-        }
+
+
+
     }
 }
 
@@ -217,6 +229,7 @@ interface AddToCart {
         count: Int,
         response: Item,
         counterValue: CounterView,
-        subTotalSpecificItem: TextView
+        subTotalSpecificItem: TextView,
+        priceTextView: TextView
     )
 }

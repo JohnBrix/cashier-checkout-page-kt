@@ -20,7 +20,7 @@ class CheckoutAdapter(val item: List<Item>, val callback: AddToCart, val view: V
         var srpPrice = itemView.findViewById(R.id.priceTextView) as TextView
         var counterView = itemView.findViewById(R.id.counterView) as CounterView
         var subTotalSpecificItem = itemView.findViewById(R.id.subTotalSpecificItem) as TextView
-
+        var priceTextView = itemView.findViewById(R.id.priceTextView) as TextView
 
 
     }
@@ -38,7 +38,14 @@ class CheckoutAdapter(val item: List<Item>, val callback: AddToCart, val view: V
 
         holder.counterView.addCounterValueChangeListener(object : CounterView.CounterValueChangeListener {
             override fun onValueDelete(count: Int) {
-                callback.checkout(view, count,itemList, holder.counterView,holder.subTotalSpecificItem)
+                callback.checkout(
+                    view,
+                    count,
+                    itemList,
+                    holder.counterView,
+                    holder.subTotalSpecificItem,
+                    holder.priceTextView
+                )
             }
 
             override fun onValueAdd(count: Int) {
@@ -47,7 +54,8 @@ class CheckoutAdapter(val item: List<Item>, val callback: AddToCart, val view: V
                     count,
                     itemList,
                     holder.counterView,
-                    holder.subTotalSpecificItem
+                    holder.subTotalSpecificItem,
+                    holder.priceTextView
                 )
             }
 
