@@ -3,7 +3,6 @@ package com.dp.cashier_page.ui.adapter
 import android.app.AlertDialog
 import android.view.*
 import android.widget.*
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dp.cashier_page.R
@@ -26,7 +25,7 @@ class InventoryAdapter(
         var fab = itemView.findViewById(R.id.fab) as Button
 
 
-        fun addToCartToCheckout(item: List<Item>) {
+        fun addToCartToCheckout(item: Item) {
 
 
             itemView.apply {
@@ -63,9 +62,10 @@ class InventoryAdapter(
                           /*  GridLayoutManager(context, 1, GridLayoutManager.VERTICAL, false)*/
                         dashboardRecycleView?.layoutManager = recyclerView.layoutManager
 
+                        var listItem = ArrayList<Item>()
+                        listItem.add(item)
 
-
-                        recyclerView.adapter = CheckoutAdapter(item)
+                        recyclerView.adapter = CheckoutAdapter(listItem)
 
 
 
@@ -92,7 +92,7 @@ class InventoryAdapter(
         
         
         holder.add.setOnClickListener{
-            holder.addToCartToCheckout(item)/*ADDED TO CART*/
+            holder.addToCartToCheckout(itemList)/*ADDED TO CART*/
         }
         
 
