@@ -38,8 +38,6 @@ class CheckoutAdapter(val item: List<Item>, val callback: AddToCart, val view: V
 
         holder.counterView.addCounterValueChangeListener(object : CounterView.CounterValueChangeListener {
             override fun onValueDelete(count: Int) {
-
-
                 callback.checkout(
                     view,
                     count,

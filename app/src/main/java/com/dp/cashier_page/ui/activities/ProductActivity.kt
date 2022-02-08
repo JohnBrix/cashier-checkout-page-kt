@@ -139,11 +139,8 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         isAdded: Boolean
     ) {
         view.apply {
-            computation(count, response, view, counterValue, subTotalSpecificItem, priceTextView,isAdded)
-
-
+            computation(count, response, view, counterValue, subTotalSpecificItem, priceTextView, isAdded)
         }
-
     }
 
 }
@@ -157,13 +154,11 @@ class ProductActivity : AppCompatActivity(), AddToCart {
      subTotalSpecificItem: TextView,
      priceTextView: TextView,
      isAdded: Boolean,
-
      ) {
-
+    println("IsAdded: $isAdded")
     view.apply {
         var cash = findViewById(R.id.cash) as TextInputEditText
         var btn = findViewById(R.id.checkOut) as Button
-
         var totalItems = findViewById(R.id.totalItems) as TextView
         var tax = findViewById(R.id.tax) as TextView
         var grandTotal = findViewById(R.id.grandTotal) as TextView
@@ -172,23 +167,18 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         /*TODO CREATE COMPUTATION HERE YOU CANT COMPUTE DUE THE LIST
         *  NAGUUNAHAN SILA PAG ID 2 PINILI MO ID 2 NACOCOMPUATE HINDI BOTH*/
 
-
-       /* if(!isAdded){
-            response?.srpPrice = response?.srpPrice!! * -1.0
-        }*/
-
-
-        var qtyToPriceTotal = count * response?.srpPrice!!
+        var qtyToPriceTotal = count * response.srpPrice!!
         subTotalSpecificItem.text = qtyToPriceTotal.toString() /*Subtotal specific item*/
 
         /* += pinaplus nya yung srpPrice mo */
-        totalAmount+= subTotalSpecificItem.text.toString().toDouble()
+        if(!isAdded) totalAmount -= response.srpPrice!!
+        else totalAmount += response.srpPrice!!
+
             priceTextView.text = response.srpPrice.toString() /*original price item*/
         println("specificItem: " + totalAmount)
         if (count > response.quantity!!) {
             Toast.makeText(context, "${count}", Toast.LENGTH_SHORT).show()
             counterView.counterValue = response.quantity!! //Stoping the count
-
         }
 
 
