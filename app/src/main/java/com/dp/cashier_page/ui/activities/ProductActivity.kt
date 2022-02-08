@@ -190,12 +190,10 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
 
                 if (computed < -0.0) {
-
-                    totalAmount += response.srpPrice!!
-                    Toast.makeText(context, "Insufficient Cash! ${totalAmount}", Toast.LENGTH_SHORT)
+                    Toast.makeText(context, "Insufficient Cash! ${computed}", Toast.LENGTH_SHORT)
                         .show()
+                    totalChange.setText(computed.toString())
                 } else {
-                    /* totalAmount -= response.srpPrice!!*/
                     Toast.makeText(context, "current computed: ${computed}!", Toast.LENGTH_SHORT)
                         .show()
                     totalChange.setText(computed.toString())
