@@ -135,11 +135,11 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         response: Item,
         counterValue: CounterView,
         subTotalSpecificItem: TextView,
-        priceTextView: TextView
+        priceTextView: TextView,
+        isAdded: Boolean
     ) {
         view.apply {
-
-            computation(count, response, view, counterValue, subTotalSpecificItem, priceTextView)
+            computation(count, response, view, counterValue, subTotalSpecificItem, priceTextView,isAdded)
 
 
         }
@@ -148,16 +148,17 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
 }
 
+ var totalAmount :Double = 0.0
+ fun computation(
+     count: Int,
+     response: Item,
+     view: View,
+     counterView: CounterView,
+     subTotalSpecificItem: TextView,
+     priceTextView: TextView,
+     isAdded: Boolean,
 
-private fun computation(
-    count: Int,
-    response: Item,
-    view: View,
-    counterView: CounterView,
-    subTotalSpecificItem: TextView,
-    priceTextView: TextView,
-
-    ) {
+     ) {
 
     view.apply {
         var cash = findViewById(R.id.cash) as TextInputEditText
@@ -172,11 +173,18 @@ private fun computation(
         *  NAGUUNAHAN SILA PAG ID 2 PINILI MO ID 2 NACOCOMPUATE HINDI BOTH*/
 
 
-        var qtyToPriceTotal = count * response.srpPrice!!
-        subTotalSpecificItem.text = qtyToPriceTotal.toString() /*Subtotal specific item*/
-        println("specificItem: " + subTotalSpecificItem.text)
-        priceTextView.text = response.srpPrice.toString() /*original price item*/
+       /* if(!isAdded){
+            response?.srpPrice = response?.srpPrice!! * -1.0
+        }*/
 
+
+        var qtyToPriceTotal = count * response?.srpPrice!!
+        subTotalSpecificItem.text = qtyToPriceTotal.toString() /*Subtotal specific item*/
+
+        /* += pinaplus nya yung srpPrice mo */
+        totalAmount+= subTotalSpecificItem.text.toString().toDouble()
+            priceTextView.text = response.srpPrice.toString() /*original price item*/
+        println("specificItem: " + totalAmount)
         if (count > response.quantity!!) {
             Toast.makeText(context, "${count}", Toast.LENGTH_SHORT).show()
             counterView.counterValue = response.quantity!! //Stoping the count
@@ -186,7 +194,7 @@ private fun computation(
 
             btn.setOnClickListener {
                 var pay: Double = cash.text.toString().toDouble()
-                var computed: Double = pay - qtyToPriceTotal
+                var computed: Double = pay - totalAmount
 //                    var vat = qtyToPriceTotal * 0.12
 //                    tax.setText(vat.toString())
 
@@ -230,6 +238,7 @@ interface AddToCart {
         response: Item,
         counterValue: CounterView,
         subTotalSpecificItem: TextView,
-        priceTextView: TextView
+        priceTextView: TextView,
+        isAdded: Boolean
     )
 }
