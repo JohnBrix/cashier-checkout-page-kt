@@ -164,11 +164,9 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         var grandTotal = findViewById(R.id.grandTotal) as TextView
         var totalChange = findViewById(R.id.totalChange) as TextView
 
-        /*TODO CREATE COMPUTATION HERE YOU CANT COMPUTE DUE THE LIST
-        *  NAGUUNAHAN SILA PAG ID 2 PINILI MO ID 2 NACOCOMPUATE HINDI BOTH*/
 
         var qtyToPriceTotal = count * response.srpPrice!!
-        subTotalSpecificItem.text = qtyToPriceTotal.toString() /*Subtotal specific item*/
+
 
         /* += pinaplus nya yung srpPrice mo */
         if(!isAdded) totalAmount -= response.srpPrice!!
@@ -176,22 +174,33 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
             priceTextView.text = response.srpPrice.toString() /*original price item*/
         println("specificItem: " + totalAmount)
+
         if (count > response.quantity!!) {
             Toast.makeText(context, "${count}", Toast.LENGTH_SHORT).show()
             counterView.counterValue = response.quantity!! //Stoping the count
-        }
-
-
+            totalAmount -= response.srpPrice!!
+        } else {
+            subTotalSpecificItem.text = qtyToPriceTotal.toString() /*Subtotal specific item*/
             btn.setOnClickListener {
                 var pay: Double = cash.text.toString().toDouble()
                 var computed: Double = pay - totalAmount
-//                    var vat = qtyToPriceTotal * 0.12
-//                    tax.setText(vat.toString())
 
-                /*pay user*/
+                Toast.makeText(context, "current total amount: ${computed}!", Toast.LENGTH_SHORT)
+                    .show()
 
 
-                totalChange.setText(computed.toString())
+                if (computed < -0.0) {
+
+                    totalAmount += response.srpPrice!!
+                    Toast.makeText(context, "Insufficient Cash! ${totalAmount}", Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    /* totalAmount -= response.srpPrice!!*/
+                    Toast.makeText(context, "current computed: ${computed}!", Toast.LENGTH_SHORT)
+                        .show()
+                    totalChange.setText(computed.toString())
+                }
+
                 /*AUTO COMPUTE*/
 //                var pay: Double = cash.text.toString().toDouble()
 //                var computed: Double = pay - qtyToPriceTotal
@@ -210,9 +219,9 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 //                        .show()
 //                }
 
-                /*    cash.clearFocus();*/
+                cash.clearFocus();
             }
-
+        }
 
 
     }
