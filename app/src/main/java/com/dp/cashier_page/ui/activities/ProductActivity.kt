@@ -29,6 +29,8 @@ import com.dp.cashier_page.ui.adapter.InventoryAdapter
 import com.dp.cashier_page.ui.viewmodel.ProductViewModel
 import com.google.android.material.textfield.TextInputEditText
 import de.starkling.shoppingcart.widget.CounterView
+import com.dp.cashier_page.repository.Product
+import java.util.stream.Collectors
 
 
 class ProductActivity : AppCompatActivity(), AddToCart {
@@ -152,140 +154,138 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             computation(count, response, view, counterValue, subTotalSpecificItem, priceTextView, isAdded,lifecycleOwner,vModel)
         }
     }
-
-}
-
- var totalAmount :Double = 0.0
- fun computation(
-     count: Int,
-     response: Item,
-     view: View,
-     counterView: CounterView,
-     subTotalSpecificItem: TextView,
-     priceTextView: TextView,
-     isAdded: Boolean,
-     lifecycleOwner: LifecycleOwner,
-     vModel: ProductViewModel,
-     ) {
-    println("IsAdded: $isAdded")
-    view.apply {
-        var cash = findViewById(R.id.cash) as TextInputEditText
-        var btn = findViewById(R.id.checkOut) as Button
-        var totalItems = findViewById(R.id.totalItems) as TextView
-        var tax = findViewById(R.id.tax) as TextView
-        var grandTotal = findViewById(R.id.grandTotal) as TextView
-        var totalChange = findViewById(R.id.totalChange) as TextView
+    var totalAmount :Double = 0.0
+    fun computation(
+        count: Int,
+        response: Item,
+        view: View,
+        counterView: CounterView,
+        subTotalSpecificItem: TextView,
+        priceTextView: TextView,
+        isAdded: Boolean,
+        lifecycleOwner: LifecycleOwner,
+        vModel: ProductViewModel,
+    ) {
+        println("IsAdded: $isAdded")
+        view.apply {
+            var cash = findViewById(R.id.cash) as TextInputEditText
+            var btn = findViewById(R.id.checkOut) as Button
+            var totalItems = findViewById(R.id.totalItems) as TextView
+            var tax = findViewById(R.id.tax) as TextView
+            var grandTotal = findViewById(R.id.grandTotal) as TextView
+            var totalChange = findViewById(R.id.totalChange) as TextView
 
 
-        var qtyToPriceTotal = count * response.srpPrice!!
+            var qtyToPriceTotal = count * response.srpPrice!!
 
 
-        /* += pinaplus nya yung srpPrice mo */
-        if(!isAdded) totalAmount -= response.srpPrice!!
-        else totalAmount += response.srpPrice!!
+            /* += pinaplus nya yung srpPrice mo */
+            if(!isAdded) totalAmount -= response.srpPrice!!
+            else totalAmount += response.srpPrice!!
 
             priceTextView.text = response.srpPrice.toString() /*original price item*/
-        println("specificItem: " + totalAmount)
-
-        if (count > response.quantity!!) {
-            Toast.makeText(context, "${count}", Toast.LENGTH_SHORT).show()
-            counterView.counterValue = response.quantity!! //Stoping the count
-            totalAmount -= response.srpPrice!!
-        } else {
-            subTotalSpecificItem.text = qtyToPriceTotal.toString() /*Subtotal specific item*/
-            btn.setOnClickListener {
-                var pay: Double = cash.text.toString().toDouble()
-                var computed: Double = pay - totalAmount
-
-                Toast.makeText(context, "current total amount: ${computed}!", Toast.LENGTH_SHORT)
-                    .show()
+            println("specificItem: " + totalAmount)
 
 
-                if (computed < -0.0) {
-                    Toast.makeText(context, "Insufficient Cash! ${computed}", Toast.LENGTH_SHORT)
-                        .show()
-                    totalChange.setText(computed.toString())
-                } else {
-                    Toast.makeText(context, "current computed: ${computed}!", Toast.LENGTH_SHORT)
-                        .show()
-
-                  /*  var vat = totalAmount * "%.2f".format(0.12).toDouble()*/
-
-                    var vat = totalAmount * 0.12
-                    var extractVat = "%.2f".format(vat)
+            if (count > response.quantity!!) {
+                Toast.makeText(context, "Cannot increment due item insufficient: ${count}", Toast.LENGTH_SHORT).show()
+                counterView.counterValue = response.quantity!! //Stoping the count
+                totalAmount -= response.srpPrice!!
+            } else {
+                subTotalSpecificItem.text = qtyToPriceTotal.toString() /*Subtotal specific item*/
+                btn.setOnClickListener {
+                    var pay: Double = cash.text.toString().toDouble()
+                    var computed: Double = pay - totalAmount
 
 
-                    totalChange.setText(computed.toString())
-                    totalItems.setText(totalAmount.toString())
-                    tax.setText(extractVat.toString())
-                    var grandTo = totalAmount + vat
-                    grandTotal.setText(grandTo.toString())
+                    if (computed < -0.0) {
+                        Toast.makeText(context, "Insufficient Cash! ${computed}", Toast.LENGTH_SHORT)
+                            .show()
+                        totalChange.setText(computed.toString())
+                    }
+                    else {
+                        Toast.makeText(context, "current computed: ${computed}!", Toast.LENGTH_SHORT)
+                            .show()
 
-                    var request = HttpPosRequest()
-                    request.cash = pay
-                    request.change = computed
-                    request.dispenseBy = "johnbrix17" /*should be pass this*/
-                    request.tax = extractVat.toString().toDouble()
-                    request.totalItems = totalAmount
 
-                    var totalId = 0
-                    totalId  += response.productId!!
-                    var totalItemName = ""
-                    totalItemName  += response.itemName!!
-                    var totalQty = 0
-                    totalQty += response.quantity!!
-                    var totalSrp = 0.0
-                    totalSrp += response.srpPrice!!
+                        var vat = totalAmount * 0.12
+                        var extractVat = "%.2f".format(vat)
 
-                    var listReq = HttpPosRequestListItem()
-                    listReq.id = totalId
-                    listReq.itemName = totalItemName
-                    listReq.quantity = totalQty
-                    listReq.srpPrice = totalSrp
 
-                    var itemList = ArrayList<HttpPosRequestListItem>()
-                    itemList.add(listReq)
+                        totalChange.setText(computed.toString())
+                        totalItems.setText(totalAmount.toString())
+                        tax.setText(extractVat.toString())
+                        var grandTo = totalAmount + vat
+                        grandTotal.setText(grandTo.toString())
 
-                    request.itemList = itemList
+                        var request = HttpPosRequest()
+                        request.cash = pay
+                        request.change = computed
+                        request.dispenseBy = "johnbrix17" /*should be pass this*/
+                        request.tax = extractVat.toString().toDouble()
+                        request.totalItems = totalAmount
 
-                    Log.i("ListItemPos: ", itemList.toString())
-                    Log.i("All request from pos: ",request.toString())
-                    dialog(context,lifecycleOwner,vModel,request)
+
+
+                        /*TODO: CREATE LIST REQUEST BY SPECIFIC QTY but same item*/
+
+                        val listRequest: List<HttpPosRequestListItem> = itemToCart.stream()
+                            .map { item ->
+                                var listReq = HttpPosRequestListItem()
+                                listReq.id = item.productId
+                                listReq.itemName = item.itemName
+                                listReq.quantity = count /*TODO FIX THIS IN SEPARATE QTY NOT SAME QTY*/
+                                listReq.srpPrice = item.srpPrice
+                                listReq
+                            }
+                            .collect(Collectors.toList())
+
+
+                        request.itemList = listRequest
+
+                        Log.i("ListItemPos: ", listRequest.toString())
+                        Log.i("All request from pos: ",request.toString())
+                        dialog(context,lifecycleOwner,vModel,request)
+                    }
+
+                    cash.clearFocus();
                 }
-
-                cash.clearFocus();
             }
+
+
+        }
+    }
+    fun dialog(
+        context: Context,
+        lifecycleOwner: LifecycleOwner,
+        vModel: ProductViewModel,
+        request: HttpPosRequest
+    ) {
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Confirmation")
+        builder.setMessage("Do you want to proceed and print a receipt?")
+        builder.setIcon(android.R.drawable.ic_dialog_alert)
+
+
+        builder.setPositiveButton("Yes"){dialogInterface, which ->
+            Toast.makeText(context,"clicked yes",Toast.LENGTH_LONG).show()
+            vModel.createPos(context,request).observe(lifecycleOwner,Observer{it
+                Log.i("RES",it.toString())
+
+            })
         }
 
-
+        builder.setNeutralButton("Cancel"){dialogInterface , which ->
+            Toast.makeText(context,"clicked cancel\n operation cancel",Toast.LENGTH_LONG).show()
+        }
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.setCancelable(false)
+        alertDialog.show()
     }
+
 }
-fun dialog(
-    context: Context,
-    lifecycleOwner: LifecycleOwner,
-    vModel: ProductViewModel,
-    request: HttpPosRequest
-) {
-    val builder = AlertDialog.Builder(context)
-    builder.setTitle("Confirmation")
-    builder.setMessage("Do you want to proceed and print a receipt?")
-    builder.setIcon(android.R.drawable.ic_dialog_alert)
 
 
-    builder.setPositiveButton("Yes"){dialogInterface, which ->
-        Toast.makeText(context,"clicked yes",Toast.LENGTH_LONG).show()
-        vModel.createPos(context,request).observe(lifecycleOwner,Observer{
-
-        })
-    }
-
-    builder.setNeutralButton("Cancel"){dialogInterface , which ->
-        Toast.makeText(context,"clicked cancel\n operation cancel",Toast.LENGTH_LONG).show()
-    }
-    val alertDialog: AlertDialog = builder.create()
-    alertDialog.setCancelable(false)
-    alertDialog.show()
-}
 
 
 
