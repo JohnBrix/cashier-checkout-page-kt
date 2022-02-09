@@ -138,7 +138,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             recyclerView.adapter = CheckoutAdapter(itemToCart, callback, view,lifecycleOwner,vModel)
         }
     }
-
+    var reLabas = HashSet<Item>()
     override fun checkout(
         view: View,
         count: Int,
@@ -150,6 +150,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         lifecycleOwner: LifecycleOwner,
         vModel: ProductViewModel
     ) {
+        reLabas.add(response)
         view.apply {
             computation(count, response, view, counterValue, subTotalSpecificItem, priceTextView, isAdded,lifecycleOwner,vModel)
         }
@@ -177,6 +178,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
 
             var qtyToPriceTotal = count * response.srpPrice!!
+
 
 
             /* += pinaplus nya yung srpPrice mo */
@@ -228,8 +230,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
 
                         /*TODO: CREATE LIST REQUEST BY SPECIFIC QTY but same item*/
-
-                        val listRequest: List<HttpPosRequestListItem> = itemToCart.stream()
+                        val listRequest: MutableList<HttpPosRequestListItem>? = reLabas.stream()
                             .map { item ->
                                 var listReq = HttpPosRequestListItem()
                                 listReq.id = item.productId
