@@ -196,26 +196,24 @@ class ProductActivity : AppCompatActivity(), AddToCart {
                 } else {
                     Toast.makeText(context, "current computed: ${computed}!", Toast.LENGTH_SHORT)
                         .show()
+
+                  /*  var vat = totalAmount * "%.2f".format(0.12).toDouble()*/
+
+                    var vat = totalAmount * 0.12
+                    var extractVat = "%.2f".format(vat)
+
+                    /*private var setCovertInches: Double = centimeter * 2.54
+    var inches = "%.2f".format(setCovertInches)
+*/
+
+
+
                     totalChange.setText(computed.toString())
+                    totalItems.setText(totalAmount.toString())
+                    tax.setText(extractVat.toString())
+                    var grandTo = totalAmount + vat
+                    grandTotal.setText(grandTo.toString())
                 }
-
-                /*AUTO COMPUTE*/
-//                var pay: Double = cash.text.toString().toDouble()
-//                var computed: Double = pay - qtyToPriceTotal
-//
-//
-//
-//
-//                var subTotalItems = qtyToPriceTotal - vat
-//
-//                totalChange.setText(computed.toString())
-//                totalItems.setText(subTotalItems.toString())
-//                grandTotal.setText(qtyToPriceTotal.toString())
-
-//                if (computed < -0.0) {
-//                    Toast.makeText(context, "Insufficient Cash!", Toast.LENGTH_SHORT)
-//                        .show()
-//                }
 
                 cash.clearFocus();
             }
