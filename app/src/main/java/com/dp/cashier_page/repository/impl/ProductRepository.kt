@@ -1,10 +1,11 @@
-package com.dp.cashier_page.repository
+package com.dp.cashier_page.repository.impl
 
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.dp.cashier_page.domain.response.product.HttpProductList
+import com.dp.cashier_page.repository.Product
 import com.google.gson.Gson
 import com.zaiko.data.constant.PomsV1
 import com.zaiko.data.retrofit.RetrofitClient

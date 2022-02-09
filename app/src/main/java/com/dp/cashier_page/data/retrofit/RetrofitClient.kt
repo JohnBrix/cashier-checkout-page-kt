@@ -31,4 +31,23 @@ class RetrofitClient {
         return retrofit
     }
 
+    fun createPos(context: Context?): Retrofit {
+        var client: OkHttpClient? = OkHttpClient.Builder()
+            .connectTimeout(50, TimeUnit.SECONDS)
+            .readTimeout(50, TimeUnit.SECONDS).build()
+
+        val chuckActivity = OkHttpClient.Builder()
+            .addInterceptor(ChuckInterceptor(context))
+            .build()
+
+        var retrofit: Retrofit = Retrofit.Builder()
+            .baseUrl(PRODUCT_URI)
+            .client(client)
+            .client(chuckActivity)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        return retrofit
+    }
+
 }
