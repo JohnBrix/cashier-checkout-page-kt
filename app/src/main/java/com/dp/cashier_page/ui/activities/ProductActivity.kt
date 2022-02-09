@@ -21,6 +21,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dp.cashier_page.R
 import com.dp.cashier_page.databinding.RecyclerProductBinding
+import com.dp.cashier_page.domain.request.HttpPosRequest
+import com.dp.cashier_page.domain.request.HttpPosRequestListItem
 import com.dp.cashier_page.domain.response.product.Item
 import com.dp.cashier_page.ui.adapter.CheckoutAdapter
 import com.dp.cashier_page.ui.adapter.InventoryAdapter
@@ -219,7 +221,36 @@ class ProductActivity : AppCompatActivity(), AddToCart {
                     var grandTo = totalAmount + vat
                     grandTotal.setText(grandTo.toString())
 
-                    dialog(context,lifecycleOwner,vModel)
+                    var request = HttpPosRequest()
+                    request.cash = pay
+                    request.change = computed
+                    request.dispenseBy = "johnbrix17" /*should be pass this*/
+                    request.tax = extractVat.toString().toDouble()
+                    request.totalItems = totalAmount
+
+                    var totalId = 0
+                    totalId  += response.productId!!
+                    var totalItemName = ""
+                    totalItemName  += response.itemName!!
+                    var totalQty = 0
+                    totalQty += response.quantity!!
+                    var totalSrp = 0.0
+                    totalSrp += response.srpPrice!!
+
+                    var listReq = HttpPosRequestListItem()
+                    listReq.id = totalId
+                    listReq.itemName = totalItemName
+                    listReq.quantity = totalQty
+                    listReq.srpPrice = totalSrp
+
+                    var itemList = ArrayList<HttpPosRequestListItem>()
+                    itemList.add(listReq)
+
+                    request.itemList = itemList
+
+                    Log.i("ListItemPos: ", itemList.toString())
+                    Log.i("All request from pos: ",request.toString())
+                    dialog(context,lifecycleOwner,vModel,request)
                 }
 
                 cash.clearFocus();
@@ -229,7 +260,12 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
     }
 }
-fun dialog(context: Context, lifecycleOwner: LifecycleOwner, vModel: ProductViewModel) {
+fun dialog(
+    context: Context,
+    lifecycleOwner: LifecycleOwner,
+    vModel: ProductViewModel,
+    request: HttpPosRequest
+) {
     val builder = AlertDialog.Builder(context)
     builder.setTitle("Confirmation")
     builder.setMessage("Do you want to proceed and print a receipt?")
@@ -238,7 +274,9 @@ fun dialog(context: Context, lifecycleOwner: LifecycleOwner, vModel: ProductView
 
     builder.setPositiveButton("Yes"){dialogInterface, which ->
         Toast.makeText(context,"clicked yes",Toast.LENGTH_LONG).show()
-     /*   vModel.getProduct()*/
+        vModel.createPos(context,request).observe(lifecycleOwner,Observer{
+
+        })
     }
 
     builder.setNeutralButton("Cancel"){dialogInterface , which ->
