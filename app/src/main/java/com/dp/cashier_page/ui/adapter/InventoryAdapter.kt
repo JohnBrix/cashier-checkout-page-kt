@@ -2,16 +2,20 @@ package com.dp.cashier_page.ui.adapter
 
 import android.view.*
 import android.widget.*
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.dp.cashier_page.R
 import com.dp.cashier_page.domain.Item
 import com.dp.cashier_page.ui.activities.AddToCart
+import com.dp.cashier_page.ui.viewmodel.ProductViewModel
 import com.squareup.picasso.Picasso
 
 
 class InventoryAdapter(
     val item: List<Item>,
-    val callback: AddToCart
+    val callback: AddToCart,
+    val lifecycleOwner: LifecycleOwner,
+    val vModel: ProductViewModel
 ) : RecyclerView.Adapter<InventoryAdapter.ViewHolder>() {
 
 
@@ -41,7 +45,7 @@ class InventoryAdapter(
             callback.onAddToCard(itemList)
         }
         holder.fab.setOnClickListener {
-            callback.openCheckout(callback)
+            callback.openCheckout(callback,lifecycleOwner,vModel)
         }
 
         Picasso.get().load(itemList?.itemPicture).into(holder.itemImages)

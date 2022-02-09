@@ -1,6 +1,7 @@
 package com.dp.cashier_page.ui.activities
 
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
@@ -59,7 +61,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
                 dashboardRecycleView?.layoutManager = recyclerView.layoutManager
 
                 recyclerView.adapter = it.itemList?.let { it1 ->
-                    InventoryAdapter(it1, this)
+                    InventoryAdapter(it1, this,this,vModel)
                 }
 
             } else if (it.resultMessage.equals("NO_CONTENT")) {
@@ -94,7 +96,11 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         println("Items: ${itemToCart.size}")
     }
 
-    override fun openCheckout(callback: AddToCart) {
+    override fun openCheckout(
+        callback: AddToCart,
+        lifecycleOwner: LifecycleOwner,
+        vModel: ProductViewModel
+    ) {
         val view = LayoutInflater.from(this)
             .inflate(R.layout.recycler_checkout, null, false)
 
@@ -125,7 +131,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             recyclerView.layoutManager = LinearLayoutManager(context)
             dashboardRecycleView?.layoutManager = recyclerView.layoutManager
             /*TODO CREATE COMPUTATION HERE TO CREATE POS*/
-            recyclerView.adapter = CheckoutAdapter(itemToCart, callback, view)
+            recyclerView.adapter = CheckoutAdapter(itemToCart, callback, view,lifecycleOwner,vModel)
         }
     }
 
@@ -136,10 +142,12 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         counterValue: CounterView,
         subTotalSpecificItem: TextView,
         priceTextView: TextView,
-        isAdded: Boolean
+        isAdded: Boolean,
+        lifecycleOwner: LifecycleOwner,
+        vModel: ProductViewModel
     ) {
         view.apply {
-            computation(count, response, view, counterValue, subTotalSpecificItem, priceTextView, isAdded)
+            computation(count, response, view, counterValue, subTotalSpecificItem, priceTextView, isAdded,lifecycleOwner,vModel)
         }
     }
 
@@ -154,6 +162,8 @@ class ProductActivity : AppCompatActivity(), AddToCart {
      subTotalSpecificItem: TextView,
      priceTextView: TextView,
      isAdded: Boolean,
+     lifecycleOwner: LifecycleOwner,
+     vModel: ProductViewModel,
      ) {
     println("IsAdded: $isAdded")
     view.apply {
@@ -202,17 +212,14 @@ class ProductActivity : AppCompatActivity(), AddToCart {
                     var vat = totalAmount * 0.12
                     var extractVat = "%.2f".format(vat)
 
-                    /*private var setCovertInches: Double = centimeter * 2.54
-    var inches = "%.2f".format(setCovertInches)
-*/
-
-
 
                     totalChange.setText(computed.toString())
                     totalItems.setText(totalAmount.toString())
                     tax.setText(extractVat.toString())
                     var grandTo = totalAmount + vat
                     grandTotal.setText(grandTo.toString())
+
+                    dialog(context,lifecycleOwner,vModel)
                 }
 
                 cash.clearFocus();
@@ -222,11 +229,31 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
     }
 }
+fun dialog(context: Context, lifecycleOwner: LifecycleOwner, vModel: ProductViewModel) {
+    val builder = AlertDialog.Builder(context)
+    builder.setTitle("Confirmation")
+    builder.setMessage("Do you want to proceed and print a receipt?")
+    builder.setIcon(android.R.drawable.ic_dialog_alert)
+
+
+    builder.setPositiveButton("Yes"){dialogInterface, which ->
+        Toast.makeText(context,"clicked yes",Toast.LENGTH_LONG).show()
+     /*   vModel.getProduct()*/
+    }
+
+    builder.setNeutralButton("Cancel"){dialogInterface , which ->
+        Toast.makeText(context,"clicked cancel\n operation cancel",Toast.LENGTH_LONG).show()
+    }
+    val alertDialog: AlertDialog = builder.create()
+    alertDialog.setCancelable(false)
+    alertDialog.show()
+}
+
 
 
 interface AddToCart {
     fun onAddToCard(item: Item)
-    fun openCheckout(callback: AddToCart)
+    fun openCheckout(callback: AddToCart, lifecycleOwner: LifecycleOwner, vModel: ProductViewModel)
     fun checkout(
         view: View,
         count: Int,
@@ -234,6 +261,8 @@ interface AddToCart {
         counterValue: CounterView,
         subTotalSpecificItem: TextView,
         priceTextView: TextView,
-        isAdded: Boolean
+        isAdded: Boolean,
+        lifecycleOwner: LifecycleOwner,
+        vModel: ProductViewModel
     )
 }

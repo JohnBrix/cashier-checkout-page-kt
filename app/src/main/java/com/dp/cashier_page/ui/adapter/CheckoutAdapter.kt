@@ -5,14 +5,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.dp.cashier_page.R
 import com.dp.cashier_page.domain.Item
 import com.dp.cashier_page.ui.activities.AddToCart
+import com.dp.cashier_page.ui.viewmodel.ProductViewModel
 import com.squareup.picasso.Picasso
 import de.starkling.shoppingcart.widget.CounterView
 
-class CheckoutAdapter(val item: List<Item>, val callback: AddToCart, val view: View) : RecyclerView.Adapter<CheckoutAdapter.ViewHolder>() {
+class CheckoutAdapter(
+    val item: List<Item>,
+    val callback: AddToCart,
+    val view: View,
+    val lifecycleOwner: LifecycleOwner,
+    val vModel: ProductViewModel
+) : RecyclerView.Adapter<CheckoutAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var itemImages = itemView.findViewById(R.id.productImage) as ImageView
@@ -45,7 +53,9 @@ class CheckoutAdapter(val item: List<Item>, val callback: AddToCart, val view: V
                     holder.counterView,
                     holder.subTotalSpecificItem,
                     holder.priceTextView,
-                    false
+                    false,
+                    lifecycleOwner,
+                    vModel
                 )
             }
 
@@ -57,7 +67,9 @@ class CheckoutAdapter(val item: List<Item>, val callback: AddToCart, val view: V
                     holder.counterView,
                     holder.subTotalSpecificItem,
                     holder.priceTextView,
-                    true
+                    true,
+                    lifecycleOwner,
+                    vModel
                 )
             }
 
