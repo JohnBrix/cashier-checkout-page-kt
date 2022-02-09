@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.dp.cashier_page.domain.HttpProductList
-import com.dp.cashier_page.domain.Item
+import com.dp.cashier_page.domain.response.product.HttpProductList
+import com.dp.cashier_page.domain.response.product.Item
 import com.dp.cashier_page.repository.ProductRepository
 
 class ProductViewModel: ViewModel() {
@@ -16,6 +16,7 @@ class ProductViewModel: ViewModel() {
 
         return repository.getProducts(context)
     }
+
 
     fun itemToCart(items: List<Item>) {
         itemsToCart.value = items

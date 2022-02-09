@@ -1,7 +1,7 @@
 package com.zaiko.data.constant
 
 
-import com.dp.cashier_page.domain.HttpProductList
+import com.dp.cashier_page.domain.response.product.HttpProductList
 import retrofit2.Call
 import retrofit2.http.GET
 

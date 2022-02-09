@@ -1,4 +1,4 @@
-package com.dp.cashier_page.domain
+package com.dp.cashier_page.domain.response.product
 
 
 import com.google.gson.annotations.SerializedName

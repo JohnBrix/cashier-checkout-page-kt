@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dp.cashier_page.R
 import com.dp.cashier_page.databinding.RecyclerProductBinding
-import com.dp.cashier_page.domain.Item
+import com.dp.cashier_page.domain.response.product.Item
 import com.dp.cashier_page.ui.adapter.CheckoutAdapter
 import com.dp.cashier_page.ui.adapter.InventoryAdapter
 import com.dp.cashier_page.ui.viewmodel.ProductViewModel

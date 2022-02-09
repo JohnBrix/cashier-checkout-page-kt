@@ -6,7 +6,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.dp.cashier_page.R
-import com.dp.cashier_page.domain.Item
+import com.dp.cashier_page.domain.response.product.Item
 import com.google.android.material.textfield.TextInputEditText
 import de.starkling.shoppingcart.widget.CounterView
 

@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.dp.cashier_page.R
-import com.dp.cashier_page.domain.Item
+import com.dp.cashier_page.domain.response.product.Item
 import com.dp.cashier_page.ui.activities.AddToCart
 import com.dp.cashier_page.ui.viewmodel.ProductViewModel
 import com.squareup.picasso.Picasso
