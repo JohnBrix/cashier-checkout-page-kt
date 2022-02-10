@@ -46,13 +46,17 @@ class CheckoutAdapter(
 
     fun getList(): List<Item> = listData
 
+    fun updateData(users: MutableList<Item>){
+
+            this.listData=users
+
+    }
     override fun onBindViewHolder(holder: CheckoutAdapter.ViewHolder, position: Int) {
         var itemList = listData.get(position)
 
         holder.counterView.addCounterValueChangeListener(object : CounterView.CounterValueChangeListener {
             override fun onValueDelete(count: Int) {
                 itemList.quantity = count
-
 
                 callback.checkout(
                     view,
@@ -64,12 +68,16 @@ class CheckoutAdapter(
                     holder.exit,
                     false,
                     lifecycleOwner,
-                    vModel
+                    vModel,
+                    checkOutDialog
                 )
+                notifyDataSetChanged()
             }
 
             override fun onValueAdd(count: Int) {
+
                 itemList.quantity = count
+
                 callback.checkout(
                     view,
                     count,
@@ -80,8 +88,10 @@ class CheckoutAdapter(
                     holder.exit,
                     true,
                     lifecycleOwner,
-                    vModel
+                    vModel,
+                    checkOutDialog
                 )
+            notifyDataSetChanged()
             }
 
         })
@@ -93,14 +103,14 @@ class CheckoutAdapter(
             notifyItemRemoved(position);
             notifyItemRangeChanged(position, getItemCount() - position)
 
-            deleteItem(position)
+            deleteItem(position,itemList)
         }
 
         holder.itemName.text = itemList.itemName
         holder.srpPrice.text = "₱ ${itemList.srpPrice.toString()}"
 
     }
-    fun deleteItem(index: Int){
+    fun deleteItem(index: Int, itemList: Item){
         listData.removeAt(index)
 
         if(listData.isEmpty()){
@@ -109,10 +119,12 @@ class CheckoutAdapter(
             Toast.makeText(view.context, "Cannot continue due no added items in cart!", Toast.LENGTH_SHORT)
                 .show()
 
-            notifyDataSetChanged()
+            listData.clear()
+
             checkOutDialog.cancel()
             checkOutDialog.dismiss()
             callback.refreshProduct()
+            notifyDataSetChanged()
         }
         notifyDataSetChanged()
     }

@@ -193,15 +193,16 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         exit: ImageView,
         isAdded: Boolean,
         lifecycleOwner: LifecycleOwner,
-        vModel: ProductViewModel
+        vModel: ProductViewModel,
+        checkOutDialog: AlertDialog
     ) {
 
 
         view.apply {
-            computation(count, response, view, counterValue, subTotalSpecificItem, priceTextView, isAdded,lifecycleOwner,vModel)
+            computation(count, response, view, counterValue, subTotalSpecificItem, priceTextView, isAdded,lifecycleOwner,vModel,checkOutDialog)
         }
     }
-
+    var current = mutableListOf<Item>()
     fun computation(
         count: Int,
         response: Item,
@@ -212,6 +213,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         isAdded: Boolean,
         lifecycleOwner: LifecycleOwner,
         vModel: ProductViewModel,
+        checkOutDialog: AlertDialog,
     ) {
         println("IsAdded: $isAdded")
         view.apply {
@@ -289,10 +291,12 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
 
                         request.itemList = listRequest
+                        current.add(response)
+                        current.clear()
 
                         Log.i("ListItemPos: ", listRequest.toString())
                         Log.i("All request from pos: ",request.toString())
-                        dialog(context,lifecycleOwner,vModel,request)
+                        dialog(context,lifecycleOwner,vModel,request,checkOutDialog)
                     }
 
                     cash.clearFocus();
@@ -303,38 +307,96 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
         }
     }
+
     fun dialog(
         context: Context,
         lifecycleOwner: LifecycleOwner,
         vModel: ProductViewModel,
-        request: HttpPosRequest
+        request: HttpPosRequest,
+        checkOutDialog: AlertDialog
     ) {
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle("Confirmation")
-        builder.setMessage("Do you want to proceed and print a receipt?")
-        builder.setIcon(android.R.drawable.ic_dialog_alert)
+
+//        val view: View =
+//            layoutInflater.inflate(R.layout.dialog_confirmation, null)
+//
+//        var dialog: AlertDialog?
+//        val mBuilder = AlertDialog.Builder(context)
+//        mBuilder.setCancelable(false)
+//        mBuilder.setView(view)
+//
+//        dialog = mBuilder.create()
+//        dialog.show()
+//
+//        val window: Window? = dialog.getWindow()
+//        if (window != null) {
+//            window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+//        }
+//        if (window != null) {
+//            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+//        }
+//
+//        view.apply {
+//
+//            var proceed = findViewById(R.id.proceed) as Button
+//
+//            proceed.setOnClickListener {
+//                dialog.cancel()
+//                itemToCart.clear()
+//
+//                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+//
+//                Toast.makeText(
+//                    applicationContext,
+//                    "Please wait for refreshing the products!",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//                productDisplay()
+//            }
+//
+//        }
+
+        var dialog: AlertDialog?
+        val mBuilder = AlertDialog.Builder(context)
+        mBuilder.setCancelable(false)
+
+        mBuilder.setTitle("Confirmation")
+        mBuilder.setMessage("Do you want to proceed and print a receipt?")
+        mBuilder.setIcon(android.R.drawable.ic_dialog_alert)
 
 
-        builder.setPositiveButton("Yes"){dialogInterface, which ->
+        /*TODO: ISSUES: if nakabili kana transaction una okay
+           pag 2nd transaction nagpapatong kasama ng transaction na nauna*/
+        mBuilder.setPositiveButton("Yes"){dialogInterface, which ->
+
             Toast.makeText(context,"clicked yes",Toast.LENGTH_LONG).show()
-            vModel.createPos(context,request).observe(lifecycleOwner,Observer{it
-                Log.i("RES",it.toString())
 
-                /*CREATE VALIDATION IF 400  PLEASE CANCEL THE TRANSACTION AND TRY AGAIN*/
-                /*TODO CREATE RECEIPT DISPLAY HERE*/
+            vModel.createPos(context,request).observe(lifecycleOwner,Observer{it
+
+                checkOutDialog.cancel()
+                checkOutDialog.dismiss()
+                itemToCart.clear()
+                checkoutAdapter?.updateData(itemToCart)
+
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+                Toast.makeText(
+                    applicationContext,
+                    "Please wait for refreshing the products!",
+                    Toast.LENGTH_SHORT
+                ).show()
+                productDisplay()
 
             })
         }
 
-        builder.setNeutralButton("Cancel"){dialogInterface , which ->
+        mBuilder.setNeutralButton("Cancel"){dialogInterface , which ->
             Toast.makeText(context,"clicked cancel\n operation cancel",Toast.LENGTH_LONG).show()
         }
-        val alertDialog: AlertDialog = builder.create()
-        alertDialog.setCancelable(false)
-        alertDialog.show()
-    }
-    override fun refreshProduct(){
+        dialog = mBuilder.create()
+        dialog.show()
 
+    }
+    override fun refreshProduct() {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
         Toast.makeText(
@@ -361,7 +423,8 @@ interface AddToCart {
         isAdded1: ImageView,
         isAdded: Boolean,
         lifecycleOwner: LifecycleOwner,
-        vModel: ProductViewModel
+        vModel: ProductViewModel,
+        checkOutDialog: AlertDialog
     )
     fun refreshProduct()
 }
