@@ -15,12 +15,14 @@ import com.squareup.picasso.Picasso
 import de.starkling.shoppingcart.widget.CounterView
 
 class CheckoutAdapter(
-    val item: List<Item>,
+    var item: List<Item>,
     val callback: AddToCart,
     val view: View,
     val lifecycleOwner: LifecycleOwner,
     val vModel: ProductViewModel
 ) : RecyclerView.Adapter<CheckoutAdapter.ViewHolder>() {
+
+    private var listData: MutableList<Item> = item as MutableList<Item>
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var itemImages = itemView.findViewById(R.id.productImage) as ImageView
@@ -29,7 +31,7 @@ class CheckoutAdapter(
         var counterView = itemView.findViewById(R.id.counterView) as CounterView
         var subTotalSpecificItem = itemView.findViewById(R.id.subTotalSpecificItem) as TextView
         var priceTextView = itemView.findViewById(R.id.priceTextView) as TextView
-
+        var exit = itemView.findViewById(R.id.exit) as ImageView
 
     }
 
@@ -39,12 +41,10 @@ class CheckoutAdapter(
         return ViewHolder(v)
     }
 
-    fun getList(): List<Item> = item
+    fun getList(): List<Item> = listData
 
     override fun onBindViewHolder(holder: CheckoutAdapter.ViewHolder, position: Int) {
-        var itemList = item.get(position)
-
-        println("ADDED ITEMS: "+itemList)
+        var itemList = listData.get(position)
 
         holder.counterView.addCounterValueChangeListener(object : CounterView.CounterValueChangeListener {
             override fun onValueDelete(count: Int) {
@@ -58,6 +58,7 @@ class CheckoutAdapter(
                     holder.counterView,
                     holder.subTotalSpecificItem,
                     holder.priceTextView,
+                    holder.exit,
                     false,
                     lifecycleOwner,
                     vModel
@@ -73,6 +74,7 @@ class CheckoutAdapter(
                     holder.counterView,
                     holder.subTotalSpecificItem,
                     holder.priceTextView,
+                    holder.exit,
                     true,
                     lifecycleOwner,
                     vModel
@@ -82,9 +84,22 @@ class CheckoutAdapter(
         })
 
         Picasso.get().load(itemList.itemPicture).into(holder.itemImages)
+
+        holder.exit.setOnClickListener {
+
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, getItemCount() - position)
+
+            deleteItem(position)
+        }
+
         holder.itemName.text = itemList.itemName
         holder.srpPrice.text = "₱ ${itemList.srpPrice.toString()}"
 
+    }
+    fun deleteItem(index: Int){
+        listData.removeAt(index)
+        notifyDataSetChanged()
     }
 
 

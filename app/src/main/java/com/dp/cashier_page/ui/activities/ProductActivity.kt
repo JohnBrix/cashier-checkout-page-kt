@@ -9,6 +9,7 @@ import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -29,7 +30,6 @@ import com.dp.cashier_page.ui.adapter.InventoryAdapter
 import com.dp.cashier_page.ui.viewmodel.ProductViewModel
 import com.google.android.material.textfield.TextInputEditText
 import de.starkling.shoppingcart.widget.CounterView
-import com.dp.cashier_page.repository.Product
 import java.util.stream.Collectors
 
 
@@ -90,8 +90,9 @@ class ProductActivity : AppCompatActivity(), AddToCart {
     }
 
     override fun onAddToCard(item: Item) {
-        /*todo create validation here using hash dont create multiple add items with same id*/
+
         itemToCart.add(item)
+
         Toast.makeText(
             applicationContext,
             "Items: ${itemToCart.size}",
@@ -140,8 +141,6 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             recyclerView.adapter = checkoutAdapter
         }
     }
-    var reLabas = mutableListOf<Item>()
-
     override fun checkout(
         view: View,
         count: Int,
@@ -149,11 +148,13 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         counterValue: CounterView,
         subTotalSpecificItem: TextView,
         priceTextView: TextView,
+        exit: ImageView,
         isAdded: Boolean,
         lifecycleOwner: LifecycleOwner,
         vModel: ProductViewModel
     ) {
-        reLabas.add(response)
+
+
         view.apply {
             computation(count, response, view, counterValue, subTotalSpecificItem, priceTextView, isAdded,lifecycleOwner,vModel)
         }
@@ -180,6 +181,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             var totalChange = findViewById(R.id.totalChange) as TextView
 
 
+
             var qtyToPriceTotal = count * response.srpPrice!!
 
 
@@ -195,7 +197,9 @@ class ProductActivity : AppCompatActivity(), AddToCart {
                 Toast.makeText(context, "Cannot increment due item insufficient: ${count}", Toast.LENGTH_SHORT).show()
                 counterView.counterValue = response.quantity!! //Stoping the count
                 totalAmount -= response.srpPrice!!
-            } else {
+            }
+
+            else {
                 subTotalSpecificItem.text = qtyToPriceTotal.toString() /*Subtotal specific item*/
 
                 btn.setOnClickListener {
@@ -276,6 +280,9 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             vModel.createPos(context,request).observe(lifecycleOwner,Observer{it
                 Log.i("RES",it.toString())
 
+                /*CREATE VALIDATION IF 400  PLEASE CANCEL THE TRANSACTION AND TRY AGAIN*/
+                /*TODO CREATE RECEIPT DISPLAY HERE*/
+
             })
         }
 
@@ -303,6 +310,7 @@ interface AddToCart {
         counterValue: CounterView,
         subTotalSpecificItem: TextView,
         priceTextView: TextView,
+        isAdded1: ImageView,
         isAdded: Boolean,
         lifecycleOwner: LifecycleOwner,
         vModel: ProductViewModel

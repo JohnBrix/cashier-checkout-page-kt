@@ -56,6 +56,14 @@
                 android:text="Subtotal : 10" />
         </LinearLayout>
 
+        <ImageView
+            android:id="@+id/exit"
+            android:layout_marginLeft="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/exit" />
+
     </LinearLayout>
 
 
