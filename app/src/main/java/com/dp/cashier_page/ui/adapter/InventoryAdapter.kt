@@ -42,7 +42,9 @@ class InventoryAdapter(
         
         
         holder.add.setOnClickListener{
+
             callback.onAddToCard(itemList)
+            holder.add.isEnabled = false
         }
         holder.fab.setOnClickListener {
             callback.openCheckout(callback,lifecycleOwner,vModel)

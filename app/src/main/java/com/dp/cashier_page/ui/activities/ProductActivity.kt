@@ -99,7 +99,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         ).show()
         println("Items: ${itemToCart.size}")
     }
-
+    lateinit var checkoutAdapter: CheckoutAdapter
     override fun openCheckout(
         callback: AddToCart,
         lifecycleOwner: LifecycleOwner,
@@ -135,10 +135,13 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             recyclerView.layoutManager = LinearLayoutManager(context)
             dashboardRecycleView?.layoutManager = recyclerView.layoutManager
             /*TODO CREATE COMPUTATION HERE TO CREATE POS*/
-            recyclerView.adapter = CheckoutAdapter(itemToCart, callback, view,lifecycleOwner,vModel)
+
+            checkoutAdapter = CheckoutAdapter(itemToCart, callback, view,lifecycleOwner,vModel)
+            recyclerView.adapter = checkoutAdapter
         }
     }
-    var reLabas = HashSet<Item>()
+    var reLabas = mutableListOf<Item>()
+
     override fun checkout(
         view: View,
         count: Int,
@@ -180,7 +183,6 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             var qtyToPriceTotal = count * response.srpPrice!!
 
 
-
             /* += pinaplus nya yung srpPrice mo */
             if(!isAdded) totalAmount -= response.srpPrice!!
             else totalAmount += response.srpPrice!!
@@ -195,6 +197,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
                 totalAmount -= response.srpPrice!!
             } else {
                 subTotalSpecificItem.text = qtyToPriceTotal.toString() /*Subtotal specific item*/
+
                 btn.setOnClickListener {
                     var pay: Double = cash.text.toString().toDouble()
                     var computed: Double = pay - totalAmount
@@ -230,12 +233,12 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
 
                         /*TODO: CREATE LIST REQUEST BY SPECIFIC QTY but same item*/
-                        val listRequest: MutableList<HttpPosRequestListItem>? = reLabas.stream()
+                        val listRequest: MutableList<HttpPosRequestListItem>? = checkoutAdapter.getList().stream()
                             .map { item ->
                                 var listReq = HttpPosRequestListItem()
                                 listReq.id = item.productId
                                 listReq.itemName = item.itemName
-                                listReq.quantity = count /*TODO FIX THIS IN SEPARATE QTY NOT SAME QTY*/
+                                listReq.quantity = item.quantity /*TODO FIX THIS IN SEPARATE QTY NOT SAME QTY*/
                                 listReq.srpPrice = item.srpPrice
                                 listReq
                             }

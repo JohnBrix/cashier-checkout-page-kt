@@ -39,6 +39,8 @@ class CheckoutAdapter(
         return ViewHolder(v)
     }
 
+    fun getList(): List<Item> = item
+
     override fun onBindViewHolder(holder: CheckoutAdapter.ViewHolder, position: Int) {
         var itemList = item.get(position)
 
@@ -46,6 +48,9 @@ class CheckoutAdapter(
 
         holder.counterView.addCounterValueChangeListener(object : CounterView.CounterValueChangeListener {
             override fun onValueDelete(count: Int) {
+                itemList.quantity = count
+
+
                 callback.checkout(
                     view,
                     count,
@@ -60,6 +65,7 @@ class CheckoutAdapter(
             }
 
             override fun onValueAdd(count: Int) {
+                itemList.quantity = count
                 callback.checkout(
                     view,
                     count,
@@ -80,6 +86,7 @@ class CheckoutAdapter(
         holder.srpPrice.text = "₱ ${itemList.srpPrice.toString()}"
 
     }
+
 
     override fun getItemCount(): Int {
         return item.size;
