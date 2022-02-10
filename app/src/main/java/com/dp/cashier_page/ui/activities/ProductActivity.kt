@@ -40,6 +40,8 @@ class ProductActivity : AppCompatActivity(), AddToCart {
     private var TAG = "ProductActivity: "
     private lateinit var inventoryAdapter: InventoryAdapter
     var itemToCart = mutableListOf<Item>()
+    lateinit var checkoutAdapter: CheckoutAdapter
+    var totalAmount :Double = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,9 +87,47 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             }
 
         })
-
-
     }
+
+    fun productDisplay(){
+        binding.inventProgBar.visibility = View.VISIBLE
+        binding.inventProgBar.requestFocus()
+        vModel.getProduct(applicationContext).observe(this, Observer {
+            Log.i(TAG, "${it}")
+
+
+            if (it.resultMessage.equals("SUCCESS")) {
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                binding.inventProgBar.visibility = View.GONE
+                var dashboardRecycleView: RecyclerView? = null
+                val recyclerView = findViewById<RecyclerView>(R.id.productRecyclerView)
+                recyclerView.layoutManager =
+                    GridLayoutManager(applicationContext, 2, GridLayoutManager.VERTICAL, false)
+                dashboardRecycleView?.layoutManager = recyclerView.layoutManager
+
+                recyclerView.adapter = it.itemList?.let { it1 ->
+                    InventoryAdapter(it1, this,this,vModel)
+                }
+
+            } else if (it.resultMessage.equals("NO_CONTENT")) {
+                binding.inventProgBar.visibility = View.GONE
+                Toast.makeText(
+                    applicationContext,
+                    "NO_CONTENT",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                binding.inventProgBar.visibility = View.GONE
+                Toast.makeText(
+                    applicationContext,
+                    "Please Check your internet and try again later!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+        })
+    }
+
 
     override fun onAddToCard(item: Item) {
 
@@ -100,7 +140,9 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         ).show()
         println("Items: ${itemToCart.size}")
     }
-    lateinit var checkoutAdapter: CheckoutAdapter
+
+
+
     override fun openCheckout(
         callback: AddToCart,
         lifecycleOwner: LifecycleOwner,
@@ -137,7 +179,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             dashboardRecycleView?.layoutManager = recyclerView.layoutManager
             /*TODO CREATE COMPUTATION HERE TO CREATE POS*/
 
-            checkoutAdapter = CheckoutAdapter(itemToCart, callback, view,lifecycleOwner,vModel)
+            checkoutAdapter = CheckoutAdapter(itemToCart, callback, view,lifecycleOwner,vModel,dialog)
             recyclerView.adapter = checkoutAdapter
         }
     }
@@ -159,7 +201,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             computation(count, response, view, counterValue, subTotalSpecificItem, priceTextView, isAdded,lifecycleOwner,vModel)
         }
     }
-    var totalAmount :Double = 0.0
+
     fun computation(
         count: Int,
         response: Item,
@@ -180,10 +222,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             var grandTotal = findViewById(R.id.grandTotal) as TextView
             var totalChange = findViewById(R.id.totalChange) as TextView
 
-
-
             var qtyToPriceTotal = count * response.srpPrice!!
-
 
             /* += pinaplus nya yung srpPrice mo */
             if(!isAdded) totalAmount -= response.srpPrice!!
@@ -258,6 +297,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
                     cash.clearFocus();
                 }
+
             }
 
 
@@ -293,11 +333,19 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         alertDialog.setCancelable(false)
         alertDialog.show()
     }
+    override fun refreshProduct(){
 
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+        Toast.makeText(
+            applicationContext,
+            "Please wait for refreshing the products!",
+            Toast.LENGTH_SHORT
+        ).show()
+        productDisplay()
+
+    }
 }
-
-
-
 
 
 interface AddToCart {
@@ -315,4 +363,5 @@ interface AddToCart {
         lifecycleOwner: LifecycleOwner,
         vModel: ProductViewModel
     )
+    fun refreshProduct()
 }

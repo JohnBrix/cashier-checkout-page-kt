@@ -1,10 +1,12 @@
 package com.dp.cashier_page.ui.adapter
 
+import android.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.dp.cashier_page.R
@@ -19,7 +21,8 @@ class CheckoutAdapter(
     val callback: AddToCart,
     val view: View,
     val lifecycleOwner: LifecycleOwner,
-    val vModel: ProductViewModel
+    val vModel: ProductViewModel,
+    var checkOutDialog: AlertDialog
 ) : RecyclerView.Adapter<CheckoutAdapter.ViewHolder>() {
 
     private var listData: MutableList<Item> = item as MutableList<Item>
@@ -99,6 +102,18 @@ class CheckoutAdapter(
     }
     fun deleteItem(index: Int){
         listData.removeAt(index)
+
+        if(listData.isEmpty()){
+            /*CANCEL DIALOG DUE NO CARTS */
+
+            Toast.makeText(view.context, "Cannot continue due no added items in cart!", Toast.LENGTH_SHORT)
+                .show()
+
+            notifyDataSetChanged()
+            checkOutDialog.cancel()
+            checkOutDialog.dismiss()
+            callback.refreshProduct()
+        }
         notifyDataSetChanged()
     }
 
