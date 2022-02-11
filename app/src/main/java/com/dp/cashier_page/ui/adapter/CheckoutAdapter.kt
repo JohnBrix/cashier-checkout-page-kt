@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -47,11 +46,6 @@ class CheckoutAdapter(
 
     fun getList(): List<Item> = listData
 
-    fun updateData(users: MutableList<Item>){
-
-            this.listData=users
-
-    }
     lateinit var vh :ViewHolder
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         var itemList = listData.get(position)
@@ -71,7 +65,8 @@ class CheckoutAdapter(
                     false,
                     lifecycleOwner,
                     vModel,
-                    checkOutDialog
+                    checkOutDialog,
+                    position
                 )
                 notifyDataSetChanged()
             }
@@ -91,7 +86,8 @@ class CheckoutAdapter(
                     true,
                     lifecycleOwner,
                     vModel,
-                    checkOutDialog
+                    checkOutDialog,
+                    position
                 )
             notifyDataSetChanged()
             }
@@ -100,19 +96,20 @@ class CheckoutAdapter(
 
         Picasso.get().load(itemList.itemPicture).into(holder.itemImages)
         vh = holder
-        holder.exit.setOnClickListener {
+        /*holder.exit.setOnClickListener {
 
             notifyItemRemoved(position);
             notifyItemRangeChanged(position, getItemCount() - position)
 
             deleteItem(position,itemList)
-        }
+        }*/
 
         holder.itemName.text = itemList.itemName
         holder.srpPrice.text = "₱ ${itemList.srpPrice.toString()}"
 
     }
-    fun deleteItem(index: Int, itemList: Item){
+    fun deleteItem(index: Int){
+
         listData.removeAt(index)
 
         if(listData.isEmpty()){
@@ -125,7 +122,7 @@ class CheckoutAdapter(
 
             checkOutDialog.cancel()
             checkOutDialog.dismiss()
-            callback.refreshProduct(itemList.srpPrice!!)
+            callback.refreshProduct()
             notifyDataSetChanged()
         }
         notifyDataSetChanged()

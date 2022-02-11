@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Price : 10" />
+                android:text="Price : 0" />
 
             <de.starkling.shoppingcart.widget.CounterView
                 android:layout_marginTop="14dp"
@@ -53,7 +53,7 @@
                 android:id="@+id/subTotalSpecificItem"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Subtotal : 10" />
+                android:text="Subtotal : 0" />
         </LinearLayout>
 
         <ImageView

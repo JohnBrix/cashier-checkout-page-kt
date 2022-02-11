@@ -183,6 +183,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             recyclerView.adapter = checkoutAdapter
         }
     }
+    var pos:Int = 0
     override fun checkout(
         view: View,
         count: Int,
@@ -194,15 +195,17 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         isAdded: Boolean,
         lifecycleOwner: LifecycleOwner,
         vModel: ProductViewModel,
-        checkOutDialog: AlertDialog
+        checkOutDialog: AlertDialog,
+        position: Int
     ) {
-
+        pos = position
 
         view.apply {
             computation(count, response, view, counterValue, subTotalSpecificItem, priceTextView, isAdded,lifecycleOwner,vModel,checkOutDialog)
         }
     }
     var current = mutableListOf<Item>()
+
     fun computation(
         count: Int,
         response: Item,
@@ -224,6 +227,12 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             var grandTotal = findViewById(R.id.grandTotal) as TextView
             var totalChange = findViewById(R.id.totalChange) as TextView
 
+
+
+
+
+
+
             var qtyToPriceTotal = count * response.srpPrice!!
 
             /* += pinaplus nya yung srpPrice mo */
@@ -233,6 +242,14 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             priceTextView.text = response.srpPrice.toString() /*original price item*/
             println("specificItem: " + totalAmount)
 
+            checkoutAdapter.apply{
+                vh.exit.setOnClickListener {
+                    notifyItemRemoved(pos);
+                    notifyItemRangeChanged(pos, getItemCount() - pos)
+
+                    deleteItem(pos)
+                }
+            }
 
             if (count > response.quantity!!) {
                 Toast.makeText(context, "Cannot increment due item insufficient: ${count}", Toast.LENGTH_SHORT).show()
@@ -243,9 +260,17 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             else {
                 subTotalSpecificItem.text = qtyToPriceTotal.toString() /*Subtotal specific item*/
 
+                var vat = totalAmount * 0.12
+                var extractVat = "%.2f".format(vat)
+
+                totalItems.setText(totalAmount.toString())
+                tax.setText(extractVat.toString())
+                var grandTo = totalAmount + vat
+                grandTotal.setText(grandTo.toString())
+
                 btn.setOnClickListener {
                     var pay: Double = cash.text.toString().toDouble()
-                    var computed: Double = pay - totalAmount
+                    var computed: Double = pay - grandTo
 
 
                     if (computed < -0.0) {
@@ -257,16 +282,16 @@ class ProductActivity : AppCompatActivity(), AddToCart {
                         Toast.makeText(context, "current computed: ${computed}!", Toast.LENGTH_SHORT)
                             .show()
 
+//
+//                        var vat = totalAmount * 0.12
+//                        var extractVat = "%.2f".format(vat)
 
-                        var vat = totalAmount * 0.12
-                        var extractVat = "%.2f".format(vat)
-
-
-                        totalChange.setText(computed.toString())
-                        totalItems.setText(totalAmount.toString())
-                        tax.setText(extractVat.toString())
-                        var grandTo = totalAmount + vat
-                        grandTotal.setText(grandTo.toString())
+                        var extractChange = "%.2f".format(computed)
+                        totalChange.setText(extractChange.toString())
+//                        totalItems.setText(totalAmount.toString())
+//                        tax.setText(extractVat.toString())
+//                        var grandTo = totalAmount + vat
+//                        grandTotal.setText(grandTo.toString())
 
                         var request = HttpPosRequest()
                         request.cash = pay
@@ -274,7 +299,6 @@ class ProductActivity : AppCompatActivity(), AddToCart {
                         request.dispenseBy = "johnbrix17" /*should be pass this*/
                         request.tax = extractVat.toString().toDouble()
                         request.totalItems = totalAmount
-
 
 
                         /*TODO: CREATE LIST REQUEST BY SPECIFIC QTY but same item*/
@@ -337,13 +361,13 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             Toast.makeText(context,"clicked yes",Toast.LENGTH_LONG).show()
             this.totalAmount = 0.0
             checkoutAdapter.freeze()
-            vModel.createPos(context,request).observe(lifecycleOwner,Observer{it
+            vModel.createPos(context,request).observe(lifecycleOwner,Observer{
 
 
                 checkOutDialog.cancel()
                 checkOutDialog.dismiss()
                 itemToCart.clear()
-                checkoutAdapter.getList()
+                checkoutAdapter.freeze()
 
                 getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
@@ -358,7 +382,9 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         }
 
         mBuilder.setNeutralButton("Cancel"){dialogInterface , which ->
+            this.totalAmount = 0.0
             btn.isEnabled = true
+            checkoutAdapter.notifyDataSetChanged()
             Toast.makeText(context,"clicked cancel\n operation cancel",Toast.LENGTH_LONG).show()
         }
 
@@ -367,7 +393,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
     }
 
-    override fun refreshProduct(srpPrice: Double) {
+    override fun refreshProduct() {
 
         this.totalAmount = 0.0
         window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
@@ -397,7 +423,8 @@ interface AddToCart {
         isAdded: Boolean,
         lifecycleOwner: LifecycleOwner,
         vModel: ProductViewModel,
-        checkOutDialog: AlertDialog
+        checkOutDialog: AlertDialog,
+        position: Int
     )
-    fun refreshProduct(srpPrice: Double)
+    fun refreshProduct()
 }
