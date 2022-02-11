@@ -1,5 +1,6 @@
 package com.dp.cashier_page.ui.adapter
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
@@ -47,7 +48,7 @@ class CheckoutAdapter(
     fun getList(): List<Item> = listData
 
     lateinit var vh :ViewHolder
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         var itemList = listData.get(position)
 
         holder.counterView.addCounterValueChangeListener(object : CounterView.CounterValueChangeListener {
@@ -96,13 +97,13 @@ class CheckoutAdapter(
 
         Picasso.get().load(itemList.itemPicture).into(holder.itemImages)
         vh = holder
-        /*holder.exit.setOnClickListener {
+        holder.exit.setOnClickListener {
 
             notifyItemRemoved(position);
             notifyItemRangeChanged(position, getItemCount() - position)
 
-            deleteItem(position,itemList)
-        }*/
+            deleteItem(position)
+        }
 
         holder.itemName.text = itemList.itemName
         holder.srpPrice.text = "₱ ${itemList.srpPrice.toString()}"

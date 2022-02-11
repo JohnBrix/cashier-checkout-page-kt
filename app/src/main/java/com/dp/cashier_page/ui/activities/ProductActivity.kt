@@ -242,14 +242,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             priceTextView.text = response.srpPrice.toString() /*original price item*/
             println("specificItem: " + totalAmount)
 
-            checkoutAdapter.apply{
-                vh.exit.setOnClickListener {
-                    notifyItemRemoved(pos);
-                    notifyItemRangeChanged(pos, getItemCount() - pos)
 
-                    deleteItem(pos)
-                }
-            }
 
             if (count > response.quantity!!) {
                 Toast.makeText(context, "Cannot increment due item insufficient: ${count}", Toast.LENGTH_SHORT).show()
