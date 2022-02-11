@@ -3,6 +3,8 @@ package com.dp.cashier_page.ui.activities
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +15,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.text.isDigitsOnly
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
@@ -227,6 +231,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             var grandTotal = findViewById(R.id.grandTotal) as TextView
             var totalChange = findViewById(R.id.totalChange) as TextView
 
+
             var qtyToPriceTotal = count * response.srpPrice!!
 
             /* += pinaplus nya yung srpPrice mo */
@@ -255,10 +260,15 @@ class ProductActivity : AppCompatActivity(), AddToCart {
                 var grandTo = totalAmount + vat
                 grandTotal.setText(grandTo.toString())
 
+
                 btn.setOnClickListener {
+                    
+                    if(cash.text.toString() == "0"){
+                        cash.setError("Cash cannot be 0")
+                    }
+
                     var pay: Double = cash.text.toString().toDouble()
                     var computed: Double = pay - grandTo
-
 
                     if (computed < -0.0) {
                         Toast.makeText(context, "Insufficient Cash! ${computed}", Toast.LENGTH_SHORT)
