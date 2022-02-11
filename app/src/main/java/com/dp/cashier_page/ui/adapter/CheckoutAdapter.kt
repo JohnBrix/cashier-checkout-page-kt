@@ -97,8 +97,22 @@ class CheckoutAdapter(
 
         Picasso.get().load(itemList.itemPicture).into(holder.itemImages)
         vh = holder
-        holder.exit.setOnClickListener {
 
+        holder.exit.setOnClickListener {
+            callback.checkout(
+                view,
+                0,
+                itemList,
+                holder.counterView,
+                holder.subTotalSpecificItem,
+                holder.priceTextView,
+                holder.exit,
+                false,
+                lifecycleOwner,
+                vModel,
+                checkOutDialog,
+                position
+            )
             notifyItemRemoved(position);
             notifyItemRangeChanged(position, getItemCount() - position)
 
@@ -115,11 +129,8 @@ class CheckoutAdapter(
 
         if(listData.isEmpty()){
             /*CANCEL DIALOG DUE NO CARTS */
-
             Toast.makeText(view.context, "Cannot continue due no added items in cart!", Toast.LENGTH_SHORT)
                 .show()
-
-            listData.clear()
 
             checkOutDialog.cancel()
             checkOutDialog.dismiss()

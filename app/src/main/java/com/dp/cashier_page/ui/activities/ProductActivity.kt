@@ -227,12 +227,6 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             var grandTotal = findViewById(R.id.grandTotal) as TextView
             var totalChange = findViewById(R.id.totalChange) as TextView
 
-
-
-
-
-
-
             var qtyToPriceTotal = count * response.srpPrice!!
 
             /* += pinaplus nya yung srpPrice mo */
@@ -275,16 +269,8 @@ class ProductActivity : AppCompatActivity(), AddToCart {
                         Toast.makeText(context, "current computed: ${computed}!", Toast.LENGTH_SHORT)
                             .show()
 
-//
-//                        var vat = totalAmount * 0.12
-//                        var extractVat = "%.2f".format(vat)
-
                         var extractChange = "%.2f".format(computed)
                         totalChange.setText(extractChange.toString())
-//                        totalItems.setText(totalAmount.toString())
-//                        tax.setText(extractVat.toString())
-//                        var grandTo = totalAmount + vat
-//                        grandTotal.setText(grandTo.toString())
 
                         var request = HttpPosRequest()
                         request.cash = pay
@@ -310,10 +296,6 @@ class ProductActivity : AppCompatActivity(), AddToCart {
                         request.itemList = listRequest
                         current.add(response)
                         current.clear()
-
-
-
-
 
                         Log.i("ListItemPos: ", listRequest.toString())
                         Log.i("All request from pos: ",request.toString())
@@ -375,9 +357,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         }
 
         mBuilder.setNeutralButton("Cancel"){dialogInterface , which ->
-            this.totalAmount = 0.0
             btn.isEnabled = true
-            checkoutAdapter.notifyDataSetChanged()
             Toast.makeText(context,"clicked cancel\n operation cancel",Toast.LENGTH_LONG).show()
         }
 
