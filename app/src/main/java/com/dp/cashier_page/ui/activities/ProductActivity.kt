@@ -336,7 +336,9 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             btn.isEnabled = false
             Toast.makeText(context,"clicked yes",Toast.LENGTH_LONG).show()
             this.totalAmount = 0.0
+            checkoutAdapter.freeze()
             vModel.createPos(context,request).observe(lifecycleOwner,Observer{it
+
 
                 checkOutDialog.cancel()
                 checkOutDialog.dismiss()
@@ -359,12 +361,16 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             btn.isEnabled = true
             Toast.makeText(context,"clicked cancel\n operation cancel",Toast.LENGTH_LONG).show()
         }
+
         dialog = mBuilder.create()
         dialog.show()
 
     }
-    override fun refreshProduct() {
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+    override fun refreshProduct(srpPrice: Double) {
+
+        this.totalAmount = 0.0
+        window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
         Toast.makeText(
             applicationContext,
@@ -393,5 +399,5 @@ interface AddToCart {
         vModel: ProductViewModel,
         checkOutDialog: AlertDialog
     )
-    fun refreshProduct()
+    fun refreshProduct(srpPrice: Double)
 }

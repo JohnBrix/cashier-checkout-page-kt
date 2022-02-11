@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -51,7 +52,8 @@ class CheckoutAdapter(
             this.listData=users
 
     }
-    override fun onBindViewHolder(holder: CheckoutAdapter.ViewHolder, position: Int) {
+    lateinit var vh :ViewHolder
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         var itemList = listData.get(position)
 
         holder.counterView.addCounterValueChangeListener(object : CounterView.CounterValueChangeListener {
@@ -97,7 +99,7 @@ class CheckoutAdapter(
         })
 
         Picasso.get().load(itemList.itemPicture).into(holder.itemImages)
-
+        vh = holder
         holder.exit.setOnClickListener {
 
             notifyItemRemoved(position);
@@ -123,10 +125,14 @@ class CheckoutAdapter(
 
             checkOutDialog.cancel()
             checkOutDialog.dismiss()
-            callback.refreshProduct()
+            callback.refreshProduct(itemList.srpPrice!!)
             notifyDataSetChanged()
         }
         notifyDataSetChanged()
+    }
+    fun freeze(){
+        vh.exit.isEnabled = false
+        vh.exit.isClickable = false
     }
 
 
