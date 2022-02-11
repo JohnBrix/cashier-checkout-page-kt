@@ -294,9 +294,13 @@ class ProductActivity : AppCompatActivity(), AddToCart {
                         current.add(response)
                         current.clear()
 
+
+
+
+
                         Log.i("ListItemPos: ", listRequest.toString())
                         Log.i("All request from pos: ",request.toString())
-                        dialog(context,lifecycleOwner,vModel,request,checkOutDialog)
+                        dialog(context,lifecycleOwner,vModel,request,checkOutDialog,btn)
                     }
 
                     cash.clearFocus();
@@ -313,47 +317,9 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         lifecycleOwner: LifecycleOwner,
         vModel: ProductViewModel,
         request: HttpPosRequest,
-        checkOutDialog: AlertDialog
+        checkOutDialog: AlertDialog,
+        btn: Button
     ) {
-
-//        val view: View =
-//            layoutInflater.inflate(R.layout.dialog_confirmation, null)
-//
-//        var dialog: AlertDialog?
-//        val mBuilder = AlertDialog.Builder(context)
-//        mBuilder.setCancelable(false)
-//        mBuilder.setView(view)
-//
-//        dialog = mBuilder.create()
-//        dialog.show()
-//
-//        val window: Window? = dialog.getWindow()
-//        if (window != null) {
-//            window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
-//        }
-//        if (window != null) {
-//            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-//        }
-//
-//        view.apply {
-//
-//            var proceed = findViewById(R.id.proceed) as Button
-//
-//            proceed.setOnClickListener {
-//                dialog.cancel()
-//                itemToCart.clear()
-//
-//                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-//
-//                Toast.makeText(
-//                    applicationContext,
-//                    "Please wait for refreshing the products!",
-//                    Toast.LENGTH_SHORT
-//                ).show()
-//                productDisplay()
-//            }
-//
-//        }
 
         var dialog: AlertDialog?
         val mBuilder = AlertDialog.Builder(context)
@@ -367,15 +333,15 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         /*TODO: ISSUES: if nakabili kana transaction una okay
            pag 2nd transaction nagpapatong kasama ng transaction na nauna*/
         mBuilder.setPositiveButton("Yes"){dialogInterface, which ->
-
+            btn.isEnabled = false
             Toast.makeText(context,"clicked yes",Toast.LENGTH_LONG).show()
-
+            this.totalAmount = 0.0
             vModel.createPos(context,request).observe(lifecycleOwner,Observer{it
 
                 checkOutDialog.cancel()
                 checkOutDialog.dismiss()
                 itemToCart.clear()
-                checkoutAdapter?.updateData(itemToCart)
+                checkoutAdapter.getList()
 
                 getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
@@ -390,6 +356,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         }
 
         mBuilder.setNeutralButton("Cancel"){dialogInterface , which ->
+            btn.isEnabled = true
             Toast.makeText(context,"clicked cancel\n operation cancel",Toast.LENGTH_LONG).show()
         }
         dialog = mBuilder.create()
