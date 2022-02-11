@@ -51,8 +51,32 @@ class CheckoutAdapter(
     override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         var itemList = listData.get(position)
 
+
         holder.counterView.addCounterValueChangeListener(object : CounterView.CounterValueChangeListener {
             override fun onValueDelete(count: Int) {
+                holder.exit.setOnClickListener {
+
+                    for (i in 1..count)
+                        callback.checkout(
+                            view,
+                            i,
+                            itemList,
+                            holder.counterView,
+                            holder.subTotalSpecificItem,
+                            holder.priceTextView,
+                            holder.exit,
+                            false,
+                            lifecycleOwner,
+                            vModel,
+                            checkOutDialog,
+                            position
+                        )
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, getItemCount() - position)
+
+                    deleteItem(position)
+                }
+
                 itemList.quantity = count
 
                 callback.checkout(
@@ -73,6 +97,29 @@ class CheckoutAdapter(
             }
 
             override fun onValueAdd(count: Int) {
+
+                holder.exit.setOnClickListener {
+
+                    for (i in 1..count)
+                        callback.checkout(
+                            view,
+                            i,
+                            itemList,
+                            holder.counterView,
+                            holder.subTotalSpecificItem,
+                            holder.priceTextView,
+                            holder.exit,
+                            false,
+                            lifecycleOwner,
+                            vModel,
+                            checkOutDialog,
+                            position
+                        )
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, getItemCount() - position)
+
+                    deleteItem(position)
+                }
 
                 itemList.quantity = count
 
@@ -98,26 +145,7 @@ class CheckoutAdapter(
         Picasso.get().load(itemList.itemPicture).into(holder.itemImages)
         vh = holder
 
-        holder.exit.setOnClickListener {
-            callback.checkout(
-                view,
-                0,
-                itemList,
-                holder.counterView,
-                holder.subTotalSpecificItem,
-                holder.priceTextView,
-                holder.exit,
-                false,
-                lifecycleOwner,
-                vModel,
-                checkOutDialog,
-                position
-            )
-            notifyItemRemoved(position);
-            notifyItemRangeChanged(position, getItemCount() - position)
 
-            deleteItem(position)
-        }
 
         holder.itemName.text = itemList.itemName
         holder.srpPrice.text = "₱ ${itemList.srpPrice.toString()}"
