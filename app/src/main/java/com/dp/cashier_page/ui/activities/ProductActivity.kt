@@ -3,6 +3,8 @@ package com.dp.cashier_page.ui.activities
 import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -54,9 +56,20 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         binding.productViewModel = vModel
         binding.lifecycleOwner = this@ProductActivity
 
-
-
         binding.inventProgBar.visibility = View.VISIBLE
+        if (checkForInternet(this)) {
+            Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show()
+            getProducts()
+        }
+        else {
+            Toast.makeText(this, "Reconnecting", Toast.LENGTH_SHORT).show()
+            getProducts()
+        }
+
+
+
+    }
+    fun getProducts(){
         vModel.getProduct(applicationContext).observe(this, Observer {
             Log.i(TAG, "${it}")
 
@@ -92,7 +105,6 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
         })
     }
-
     fun productDisplay(){
         binding.inventProgBar.visibility = View.VISIBLE
         binding.inventProgBar.requestFocus()
@@ -358,34 +370,17 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             Toast.makeText(context,"clicked yes",Toast.LENGTH_LONG).show()
             this.totalAmount = 0.0
             checkoutAdapter.freeze()
-            vModel.createPos(context,request).observe(lifecycleOwner,Observer{it
 
-                checkOutDialog.cancel()
-                checkOutDialog.dismiss()
-                itemToCart.clear()
-                checkoutAdapter.freeze()
+            if (checkForInternet(this)) {
+                Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show()
+                createPos(context,request,lifecycleOwner,checkOutDialog,grandTo,customer)
+            }
+            else {
+                Toast.makeText(this, "Reconnecting", Toast.LENGTH_SHORT).show()
+                createPos(context, request, lifecycleOwner, checkOutDialog, grandTo, customer)
+            }
 
-                var statusCode = it.response?.statusCode
-                if(statusCode == 200){
-                    Toast.makeText(
-                        applicationContext,
-                        "Success Print!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    PdfGenerator.generatePdf(this, it,grandTo,totalAmount,customer,request)
 
-                }
-
-                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-
-                Toast.makeText(
-                    applicationContext,
-                    "Please wait for refreshing the products!",
-                    Toast.LENGTH_SHORT
-                ).show()
-                productDisplay()
-
-            })
         }
 
         mBuilder.setNeutralButton("Cancel"){dialogInterface , which ->
@@ -397,7 +392,43 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         dialog.show()
 
     }
+    fun createPos(
+        context: Context,
+        request: HttpPosRequest,
+        lifecycleOwner: LifecycleOwner,
+        checkOutDialog: AlertDialog,
+        grandTo: Double,
+        customer: String
+    ) {
+        vModel.createPos(context,request).observe(lifecycleOwner,Observer{it
 
+            checkOutDialog.cancel()
+            checkOutDialog.dismiss()
+            itemToCart.clear()
+            checkoutAdapter.freeze()
+
+            var statusCode = it.response?.statusCode
+            if(statusCode == 200){
+                Toast.makeText(
+                    applicationContext,
+                    "Success Print!",
+                    Toast.LENGTH_SHORT
+                ).show()
+                PdfGenerator.generatePdf(this, it,grandTo,totalAmount,customer,request)
+
+            }
+
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
+            Toast.makeText(
+                applicationContext,
+                "Please wait for refreshing the products!",
+                Toast.LENGTH_SHORT
+            ).show()
+            productDisplay()
+
+        })
+    }
     fun permissionCreationOfReceipt() {
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.M){
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -429,17 +460,50 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         }
     }
 
+    private fun checkForInternet(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val network = connectivityManager.activeNetwork ?: return false
+            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+
+            return when {
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                else -> false
+            }
+        } else {
+            @Suppress("DEPRECATION") val networkInfo =
+                connectivityManager.activeNetworkInfo ?: return false
+            @Suppress("DEPRECATION")
+            return networkInfo.isConnected
+        }
+    }
+
     override fun refreshProduct() {
 
         this.totalAmount = 0.0
         window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        if (checkForInternet(this)) {
+            Toast.makeText(
+                applicationContext,
+                "Please wait for refreshing the products!",
+                Toast.LENGTH_SHORT
+            ).show()
+            Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show()
+            productDisplay()
+        }
+        else {
+            Toast.makeText(
+                applicationContext,
+                "Please wait for refreshing the products!",
+                Toast.LENGTH_SHORT
+            ).show()
+            Toast.makeText(this, "Reconnecting", Toast.LENGTH_SHORT).show()
+            productDisplay()
+        }
 
-        Toast.makeText(
-            applicationContext,
-            "Please wait for refreshing the products!",
-            Toast.LENGTH_SHORT
-        ).show()
-        productDisplay()
+
 
     }
 }

@@ -80,6 +80,7 @@ object PdfGenerator {
         //Add list
         addTable(layoutDocument, response,customer,request)
 
+
         layoutDocument.close()
         Toast.makeText(context, "Pdf saved successfully to location $filePath", Toast.LENGTH_LONG).show()
 
@@ -128,6 +129,8 @@ object PdfGenerator {
         table.addCell(Paragraph("Total").setBold())
         table.addCell(Paragraph("Date").setBold())
 
+
+
         val dateBought = SimpleDateFormat(" MMMM dd, yyyy",Locale.getDefault())
             .format(System.currentTimeMillis())
 
@@ -150,6 +153,7 @@ object PdfGenerator {
             table.addCell(Paragraph(a.transactionDateStr + ""))*/
         }
         layoutDocument.add(table)
+
     }
 
     private fun addEmptyLine(layoutDocument: Document, number: Int) {
