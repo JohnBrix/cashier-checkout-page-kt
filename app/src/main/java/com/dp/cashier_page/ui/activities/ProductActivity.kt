@@ -368,7 +368,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
             btn.isEnabled = false
             Toast.makeText(context,"clicked yes",Toast.LENGTH_LONG).show()
-            this.totalAmount = 0.0
+
             checkoutAdapter.freeze()
 
             if (checkForInternet(this)) {
@@ -415,7 +415,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
                     Toast.LENGTH_SHORT
                 ).show()
                 PdfGenerator.generatePdf(this, it,grandTo,totalAmount,customer,request)
-
+                this.totalAmount = 0.0
             }
 
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
