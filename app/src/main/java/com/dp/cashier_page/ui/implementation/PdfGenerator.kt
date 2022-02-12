@@ -7,7 +7,6 @@ import android.widget.Toast
 import com.dp.cashier_page.R
 import com.dp.cashier_page.domain.request.HttpPosRequest
 import com.dp.cashier_page.domain.response.pos.HttpPos
-import com.dp.cashier_page.domain.response.pos.HttpPosResponse
 import com.itextpdf.io.font.constants.StandardFonts
 import com.itextpdf.kernel.colors.ColorConstants
 import com.itextpdf.kernel.font.PdfFontFactory
@@ -30,7 +29,7 @@ object PdfGenerator {
     private val linkSample = "https://www.facebook.com/oemplusbacoor"
     fun generatePdf(
         context: Context,
-        info: HttpPos,
+        response: HttpPos,
         grandTo: Double,
         totalAmount: Double,
         customer: String,
@@ -70,7 +69,7 @@ object PdfGenerator {
         addEmptyLine(layoutDocument,1)
 
         // customer reference information
-        addDebitCredit(layoutDocument, info.response,grandTo,totalAmount)
+        addDebitCredit(layoutDocument, request,grandTo,totalAmount,response)
 
         //add empty line
         addEmptyLine(layoutDocument,1)
@@ -79,7 +78,7 @@ object PdfGenerator {
         addSubHeading(layoutDocument, "Transactions")
 
         //Add list
-        addTable(layoutDocument, info,customer,request)
+        addTable(layoutDocument, response,customer,request)
 
         layoutDocument.close()
         Toast.makeText(context, "Pdf saved successfully to location $filePath", Toast.LENGTH_LONG).show()
@@ -125,7 +124,7 @@ object PdfGenerator {
         table.addCell(Paragraph("Item").setBold())
         table.addCell(Paragraph("Customer").setBold())
         table.addCell(Paragraph("Qty").setBold())
-        table.addCell(Paragraph("Price/Q").setBold())
+        table.addCell(Paragraph("Srp").setBold())
         table.addCell(Paragraph("Total").setBold())
         table.addCell(Paragraph("Date").setBold())
 
@@ -161,9 +160,10 @@ object PdfGenerator {
 
     private fun addDebitCredit(
         layoutDocument: Document,
-        info: HttpPosResponse?,
+        info: HttpPosRequest,
         grandTo: Double,
-        totalAmount: Double
+        totalAmount: Double,
+        response: HttpPos
     ) {
 
         val table = Table(
@@ -174,13 +174,14 @@ object PdfGenerator {
                 )
             )
         )
-
+        table.addCell(Paragraph("Transaction Number: ").setBold())
+        table.addCell(Paragraph("${response.response?.transactionNumber}"))
         table.addCell(Paragraph("Cash").setBold())
-        table.addCell(Paragraph("${info?.cash}"))
+        table.addCell(Paragraph("${info.cash}"))
         table.addCell(Paragraph("Change").setBold())
-        table.addCell(Paragraph("${info?.change}"))
+        table.addCell(Paragraph("${info.change}"))
         table.addCell(Paragraph("Tax").setBold())
-        table.addCell(Paragraph("${info?.tax}"))
+        table.addCell(Paragraph("${info.tax}"))
         table.addCell(Paragraph("Sub Total").setBold())
         table.addCell(Paragraph("${totalAmount}"))
         table.addCell(Paragraph("Grand Total").setBold())
