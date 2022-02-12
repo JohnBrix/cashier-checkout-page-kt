@@ -60,6 +60,9 @@ dependencies {
     /*floating btn*/
     implementation 'com.github.imtuann:FloatingActionButtonExpandable:1.1.2'
 
+    /*itextPdf*/
+    implementation 'com.itextpdf:itext7-core:7.1.12'
+
     /*fragment viewModel and viewPager 2*/
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'

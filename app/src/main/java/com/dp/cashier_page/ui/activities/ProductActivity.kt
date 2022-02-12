@@ -2,9 +2,9 @@ package com.dp.cashier_page.ui.activities
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,8 +15,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.text.isDigitsOnly
-import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
@@ -32,6 +30,7 @@ import com.dp.cashier_page.domain.response.product.Item
 import com.dp.cashier_page.ui.adapter.CheckoutAdapter
 import com.dp.cashier_page.ui.adapter.InventoryAdapter
 import com.dp.cashier_page.ui.viewmodel.ProductViewModel
+import com.dp.final_receipt_zm.ui.PdfGenerator
 import com.google.android.material.textfield.TextInputEditText
 import de.starkling.shoppingcart.widget.CounterView
 import java.util.stream.Collectors
@@ -46,7 +45,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
     var itemToCart = mutableListOf<Item>()
     lateinit var checkoutAdapter: CheckoutAdapter
     var totalAmount :Double = 0.0
-
+    private val STORAGE_CODE = 1001
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding =
@@ -56,13 +55,14 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         binding.lifecycleOwner = this@ProductActivity
 
 
+
         binding.inventProgBar.visibility = View.VISIBLE
         vModel.getProduct(applicationContext).observe(this, Observer {
             Log.i(TAG, "${it}")
 
 
             if (it.resultMessage.equals("SUCCESS")) {
-
+                permissionCreationOfReceipt()
                 binding.inventProgBar.visibility = View.GONE
                 var dashboardRecycleView: RecyclerView? = null
                 val recyclerView = findViewById<RecyclerView>(R.id.productRecyclerView)
@@ -230,7 +230,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
             var tax = findViewById(R.id.tax) as TextView
             var grandTotal = findViewById(R.id.grandTotal) as TextView
             var totalChange = findViewById(R.id.totalChange) as TextView
-
+            var customerName = findViewById(R.id.customer) as TextInputEditText
 
             var qtyToPriceTotal = count * response.srpPrice!!
 
@@ -262,9 +262,12 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
 
                 btn.setOnClickListener {
-                    
+
                     if(cash.text.toString() == "0"){
                         cash.setError("Cash cannot be 0")
+                    }
+                    else if (customerName.text.toString() == ""||customerName.text.toString() == null){
+                        customerName.setError("Customer cannot be Empty")
                     }
 
                     var pay: Double = cash.text.toString().toDouble()
@@ -309,7 +312,7 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
                         Log.i("ListItemPos: ", listRequest.toString())
                         Log.i("All request from pos: ",request.toString())
-                        dialog(context,lifecycleOwner,vModel,request,checkOutDialog,btn)
+                        dialog(context,lifecycleOwner,vModel,request,checkOutDialog,btn,grandTo,totalAmount,customerName.text.toString())
                     }
 
                     cash.clearFocus();
@@ -321,18 +324,25 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         }
     }
 
+
+
     fun dialog(
         context: Context,
         lifecycleOwner: LifecycleOwner,
         vModel: ProductViewModel,
         request: HttpPosRequest,
         checkOutDialog: AlertDialog,
-        btn: Button
+        btn: Button,
+        grandTo: Double,
+        totalAmount: Double,
+        customer: String
     ) {
 
         var dialog: AlertDialog?
         val mBuilder = AlertDialog.Builder(context)
         mBuilder.setCancelable(false)
+
+
 
         mBuilder.setTitle("Confirmation")
         mBuilder.setMessage("Do you want to proceed and print a receipt?")
@@ -341,18 +351,30 @@ class ProductActivity : AppCompatActivity(), AddToCart {
 
         /*TODO: ISSUES: if nakabili kana transaction una okay
            pag 2nd transaction nagpapatong kasama ng transaction na nauna*/
+
         mBuilder.setPositiveButton("Yes"){dialogInterface, which ->
+
             btn.isEnabled = false
             Toast.makeText(context,"clicked yes",Toast.LENGTH_LONG).show()
             this.totalAmount = 0.0
             checkoutAdapter.freeze()
-            vModel.createPos(context,request).observe(lifecycleOwner,Observer{
-
+            vModel.createPos(context,request).observe(lifecycleOwner,Observer{it
 
                 checkOutDialog.cancel()
                 checkOutDialog.dismiss()
                 itemToCart.clear()
                 checkoutAdapter.freeze()
+
+                var statusCode = it.response?.statusCode
+                if(statusCode == 200){
+                    Toast.makeText(
+                        applicationContext,
+                        "Success Print!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    PdfGenerator.generatePdf(this, it,grandTo,totalAmount,customer,request)
+
+                }
 
                 getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
@@ -374,6 +396,37 @@ class ProductActivity : AppCompatActivity(), AddToCart {
         dialog = mBuilder.create()
         dialog.show()
 
+    }
+
+    fun permissionCreationOfReceipt() {
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.M){
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_DENIED
+            ){
+                val permission = arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                requestPermissions(permission, STORAGE_CODE)
+            }else{
+                Toast.makeText(
+                    applicationContext,
+                    "true",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+              /*  var iName = ArrayList<String>()
+                iName.add("Raider Tire")
+                iName.add("Raider Headlight")
+                iName.add("Motor Break")
+                PdfGenerator.generatePdf(this, iName)*/
+            }
+        }else{
+
+            Toast.makeText(
+                applicationContext,
+                "default build ver",
+                Toast.LENGTH_SHORT
+            ).show()
+            /*this.totalAmount = 0.0*/
+        }
     }
 
     override fun refreshProduct() {
